@@ -8,6 +8,11 @@ user_agent_mobile = 'Mozilla/5.0 (iPhone; U; CPU iPhone OS 4_2_1 like Mac OS X; 
 user_agent_desktop = 'Mozilla/5.0 (Windows NT 6.1; WOW64; rv:23.0) Gecko/20130406 Firefox/23.0'
 
 
+def get_image_path(image):
+    addon_id = 'plugin.video.paktvforum'
+    image = 'special://home/addons/{id}/resources/images/{image}'.format(id=addon_id, image=image)
+
+
 def get_remote_data(url, ismobile=True):
     user_agent = user_agent_mobile if ismobile else user_agent_desktop
 
