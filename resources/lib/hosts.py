@@ -1,11 +1,27 @@
 import resources.lib.structure as s
 
+
+class Host():
+    def __init__(self, server, label, thumb=None):
+        self.server = server,
+        self.label = label,
+        self.__thumb = thumb
+
+    def get_thumb(self, default=None):
+        if self.__thumb != None:
+            result = self.__thumb
+        else:
+            result = default if default != None else ''
+
+        return util.get_image_path(result)
+
+
 ''' Resolvable Hosts '''
-dailymotion = s.Host('dailymotion.com', 'Daily Motion', 'dailymotion.png')
-facebook = s.Host('facebook.com', 'Facebook', 'facebook.png')
-hostingbulk = s.Host('hostingbulk.com', 'Hosting Bulk')
-nowvideo = s.Host('nowvideo.eu', 'Now Video', 'nowvideo.png')
-putlocker = s.Host('putlocker.com', 'PutLocker', 'putlocker.png')
-tunepk = s.Host('tune.pk', 'Tune PK', 'tunepk.jpg')
-videoweed = s.Host('videoweed.es', 'Video Weed', 'videoweed.jpg')
-youtube = s.Host('youtube.com', 'Youtube', 'youtube.png')
+dailymotion = Host('dailymotion.com', 'Daily Motion', 'dailymotion.png')
+facebook = Host('facebook.com', 'Facebook', 'facebook.png')
+hostingbulk = Host('hostingbulk.com', 'Hosting Bulk')
+nowvideo = Host('nowvideo.eu', 'Now Video', 'nowvideo.png')
+putlocker = Host('putlocker.com', 'PutLocker', 'putlocker.png')
+tunepk = Host('tune.pk', 'Tune PK', 'tunepk.jpg')
+videoweed = Host('videoweed.es', 'Video Weed', 'videoweed.jpg')
+youtube = Host('youtube.com', 'Youtube', 'youtube.png')

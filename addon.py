@@ -156,26 +156,32 @@ def browse_shows(cls, showid, showpage=1):
 
     plugin.log.debug('browse show: {show}'.format(show=url))
 
-    videos, next_url = api.browse_episodes(url, showpage)
+    videos, next_url = api.get_episode_menu(url, showpage)
 
-    items = [{
-        'label': item['label'],
-        'path': plugin.url_for('get_episode_data', siteid=siteid, cls=cls,
-            showid=showid, showpage=1, episodeid=index, url=item['url'])
-    } for index, item in enumerate(videos)]
+    items= []
 
-    if next_url:
-        items.append({
-            'label': 'Next >>',
-            'path': plugin.url_for('browse_shows', siteid=siteid,
-                    cls=cls, showid=showid, showpage=str(showpage + 1), url=next_url)
-        })
+    if videos:
+        items = [{
+            'label': item['label'],
+            'path': plugin.url_for('get_episode_data', siteid=siteid, cls=cls,
+                showid=showid, episodeid=index, url=item['url'])
+        } for index, item in enumerate(videos)]
+
+        if next_url:
+            items.append({
+                'label': 'Next >>',
+                'path': plugin.url_for('browse_shows', siteid=siteid,
+                        cls=cls, showid=showid, showpage=str(showpage + 1), url=next_url)
+            })
+    else:
+        ## TODO: Pop up dialog: No episodes found.
+        pass
 
     return items
 
 
-@plugin.route('/sites/<cls>/shows/s<showid>/<showpage>/episodes/e<episodeid>/')
-def get_episode_data(cls, showid, showpage, episodeid):
+@plugin.route('/sites/<cls>/shows/s<showid>/episodes/e<episodeid>/')
+def get_episode_data(cls, showid, episodeid):
     siteid = int(plugin.request.args['siteid'][0])
     url = plugin.request.args['url'][0]
     api = BaseForum.__subclasses__()[int(siteid)]()

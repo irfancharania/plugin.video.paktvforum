@@ -36,8 +36,8 @@ class ThePakTvApi(BaseForum):
 
     category_morning = s.Category('Browse Morning/Cooking Shows',
         [
-            s.Channel('286', 'Morning Shows'),
-            s.Channel('141', 'Cooking Shows'),
+            s.Channel('286', 'Morning Shows', 'morning.jpg'),
+            s.Channel('141', 'Cooking Shows', 'cooking.jpg'),
         ])
 
     category_news = s.Category('Browse Current Affairs Talk Shows',
@@ -208,11 +208,14 @@ class ThePakTvApi(BaseForum):
         pass
 
 
-    def browse_episodes(self, url, page=1):
+    def get_episode_menu(self, url, page=1):
+        ''' Get episodes for specified show '''
+
         data = util.get_remote_data(url)
         soup = BeautifulSoup(data, convertEntities=BeautifulSoup.HTML_ENTITIES)
 
         items = []
+        next_url = None
 
         container = soup.find('ul', id='threads')
         if container and len(container) > 0:
@@ -228,7 +231,6 @@ class ThePakTvApi(BaseForum):
                 })
 
             navlink = soup.find('div', attrs={'data-role': 'vbpagenav'})
-            next_url = None
 
             if navlink:
                 total_pages = int(navlink['data-totalpages'])
@@ -241,12 +243,16 @@ class ThePakTvApi(BaseForum):
 
 ###########################################################################
 
+
+
     def get_episode_data(self, url):
         data = util.get_remote_data(url)
         soup = BeautifulSoup(data, convertEntities=BeautifulSoup.HTML_ENTITIES)
 
         linklist = soup.find('ol', id='posts').find('blockquote', "postcontent restore").findAll('a')
 
+
+        util.clean_post_links(linklist)
         items = []
 
         for item in linklist:
@@ -264,6 +270,8 @@ class ThePakTvApi(BaseForum):
                     'vid': vid
                 })
         return items
+
+
 
     def play_video(self):
         pass

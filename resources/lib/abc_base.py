@@ -3,6 +3,7 @@ import abc
 class BaseForum(object):
     __metaclass__ = abc.ABCMeta
 
+'''
     @abc.abstractmethod
     def browse_channels(self):
         return
@@ -22,3 +23,4 @@ class BaseForum(object):
     @abc.abstractmethod
     def play_video(self):
         return
+'''
