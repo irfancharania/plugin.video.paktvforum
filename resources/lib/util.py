@@ -11,6 +11,7 @@ user_agent_desktop = 'Mozilla/5.0 (Windows NT 6.1; WOW64; rv:23.0) Gecko/2013040
 def get_image_path(image):
     addon_id = 'plugin.video.paktvforum'
     image = 'special://home/addons/{id}/resources/images/{image}'.format(id=addon_id, image=image)
+    return image
 
 
 def get_remote_data(url, ismobile=True):

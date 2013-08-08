@@ -18,9 +18,13 @@ def index():
         'icon': sc.local_thumb,
         } for index, sc in enumerate(BaseForum.__subclasses__())]
 
+
+    thumb = util.get_image_path('settings.png')
     items.append({
-        'label': 'Url Resolver Settings',
+        'label': '[COLOR white]Url Resolver Settings[/COLOR]',
         'path': plugin.url_for('get_urlresolver_settings'),
+        'thumbnail': thumb,
+        'icon': thumb
         })
     return items
 
@@ -70,7 +74,7 @@ def get_category_menu(cls):
     c = api.get_category_menu()
     if c:
         categoryitems = [{
-            'label': item['label'],
+            'label': '[B]{item}[/B]'.format(item=item['label']),
             'path': plugin.url_for('browse_category', siteid=siteid, cls=cls,
                 categoryid=item['categoryid'])
         } for item in c]
@@ -89,8 +93,8 @@ def browse_category(cls, categoryid):
 
     items = [{
         'label': item['label'],
-        'thumbnail': item.get('thumb', ''),
-        'icon': item.get('thumb', ''),
+        'thumbnail': item.get('thumb', api.local_thumb),
+        'icon': item.get('thumb', api.local_thumb),
         'path': plugin.url_for('browse_channels', siteid=siteid, cls=cls,
             channelid=item['id'])
     } for item in api.get_channel_menu(categoryid)]
@@ -99,7 +103,7 @@ def browse_category(cls, categoryid):
     return sorted(items, key=by_label)
 
 
-@plugin.route('/sites/<cls>/frames/<frameid>/')
+@plugin.route('/sites/<cls>/frames/f<frameid>/')
 def browse_frame(cls, frameid):
     siteid = int(plugin.request.args['siteid'][0])
     url = plugin.request.args['url'][0]
@@ -116,32 +120,33 @@ def browse_frame(cls, frameid):
     return items
 
 
-@plugin.route('/sites/<cls>/channels/<channelid>/')
+@plugin.route('/sites/<cls>/channels/c<channelid>/')
 def browse_channels(cls, channelid):
     siteid = int(plugin.request.args['siteid'][0])
     api = BaseForum.__subclasses__()[int(siteid)]()
 
     plugin.log.debug('browse channel: {channel}'.format(channel=channelid))
 
-    shows, episodes = api.get_show_menu(channelid)
-
-    episodeitems = [{
-        'label': item['label'],
-        'path': plugin.url_for('browse_shows', siteid=siteid, cls=cls,
-            showid=item['id'], showpage=1, url=item['url'])
-    } for item in episodes]
+    channels, shows = api.get_show_menu(channelid)
 
     showitems = [{
         'label': item['label'],
-        'path': plugin.url_for('browse_channels', siteid=siteid, cls=cls,
-            channelid=item['id'], url=item['url'])
+        'path': plugin.url_for('browse_shows', siteid=siteid, cls=cls,
+            showid=item['id'], showpage=1, url=item['url'])
     } for item in shows]
 
-    items = episodeitems + showitems
+    channelitems = [{
+        'label': '[B]{item}[/B]'.format(item=item['label']),
+        'path': plugin.url_for('browse_channels', siteid=siteid, cls=cls,
+            channelid=item['id'], url=item['url'])
+    } for item in channels]
+
+    by_label = itemgetter('label')
+    items = showitems + sorted(channelitems, key=by_label)
     return items
 
 
-@plugin.route('/sites/<cls>/shows/<showid>/<showpage>/')
+@plugin.route('/sites/<cls>/shows/s<showid>/<showpage>/')
 def browse_shows(cls, showid, showpage=1):
     siteid = int(plugin.request.args['siteid'][0])
     url = plugin.request.args['url'][0]
@@ -166,10 +171,10 @@ def browse_shows(cls, showid, showpage=1):
                     cls=cls, showid=showid, showpage=str(showpage + 1), url=next_url)
         })
 
-    return plugin.finish(items, update_listing=True)
+    return items
 
 
-@plugin.route('/sites/<cls>/shows/<showid>/<showpage>/episodes/<episodeid>/')
+@plugin.route('/sites/<cls>/shows/s<showid>/<showpage>/episodes/e<episodeid>/')
 def get_episode_data(cls, showid, showpage, episodeid):
     siteid = int(plugin.request.args['siteid'][0])
     url = plugin.request.args['url'][0]

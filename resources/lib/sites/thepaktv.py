@@ -4,7 +4,7 @@ from BeautifulSoup import BeautifulSoup
 import resources.lib.util as util
 import re
 import HTMLParser
-import resources.lib.category as c
+import resources.lib.structure as s
 
 #import logging
 #logging.basicConfig(level=logging.DEBUG)
@@ -18,56 +18,118 @@ class ThePakTvApi(BaseForum):
     section_url_template = 'forumdisplay.php?f='
 
 ###############################################
-    category_drama = c.category('Browse Pakistani Dramas',
+    category_drama = s.category('Browse Pakistani Dramas',
         [
             {'label': 'Geo',
              'id': '16',
-             'thumb': util.get_image_path('thumb_paktv.png'),
+             'thumb': util.get_image_path('geo.png'),
             },
             {'label': 'Ary Digital',
              'id': '18',
-             'thumb': util.get_image_path('thumb_paktv.png'),
+             'thumb': util.get_image_path('ary.png'),
             },
             {'label': 'Hum TV',
              'id': '17',
-             'thumb': util.get_image_path('thumb_paktv.png'),
+             'thumb': util.get_image_path('hum.png'),
             },
             {'label': 'PTV Home',
              'id': '15',
-             'thumb': util.get_image_path('thumb_paktv.png'),
+             'thumb': util.get_image_path('ptv.png'),
             },
             {'label': 'Urdu 1',
              'id': '954',
-             'thumb': util.get_image_path('thumb_paktv.png'),
+             'thumb': util.get_image_path('urdu1.png'),
             },
             {'label': 'Geo Kahani',
              'id': '1118',
-             'thumb': util.get_image_path('thumb_paktv.png'),
+             'thumb': util.get_image_path('geoKahani.png'),
             },
             {'label': 'A Plus',
              'id': '24',
-             'thumb': util.get_image_path('thumb_paktv.png'),
+             'thumb': util.get_image_path('aplus.png'),
             },
             {'label': 'TV One',
              'id': '19',
-             'thumb': util.get_image_path('thumb_paktv.png'),
+             'thumb': util.get_image_path('tv1.png'),
             },
             {'label': 'Express Entertainment',
              'id': '619',
-             'thumb': util.get_image_path('thumb_paktv.png'),
+             'thumb': util.get_image_path('expressEntertainment.png'),
             },
             {'label': 'ARY Musik',
              'id': '25',
-             'thumb': util.get_image_path('thumb_paktv.png'),
+             'thumb': util.get_image_path('aryMusik.png'),
             },
             {'label': 'ATV',
              'id': '23',
-             'thumb': util.get_image_path('thumb_paktv.png'),
+             'thumb': util.get_image_path('atv.png'),
             }
         ])
 
+    category_morning = s.category('Browse Morning/Cooking Shows',
+        [
+            {'label': 'Morning Shows',
+             'id': '286',
+            },
+            {'label': 'Cooking Shows',
+             'id': '141',
+            },
+        ])
+
+    category_news = s.category('Browse Current Affairs Talk Shows',
+        [
+            {'label': 'Geo News',
+             'id': '26',
+             'thumb': util.get_image_path('geoNews.png'),
+            },
+            {'label': 'Express News',
+             'id': '27',
+             'thumb': util.get_image_path('expressNews.png'),
+            },
+            {'label': 'Dunya TV',
+             'id': '29',
+             'thumb': util.get_image_path('dunya.png'),
+            },
+            {'label': 'AAJ News',
+             'id': '28',
+             'thumb': util.get_image_path('aaj.png'),
+            },
+            {'label': 'Dawn News',
+             'id': '53',
+             'thumb': util.get_image_path('dawn.png'),
+            },
+            {'label': 'Ary News',
+             'id': '30',
+             'thumb': util.get_image_path('aryNews.png'),
+            },
+            {'label': 'CNBC Pakistan',
+             'id': '735',
+             'thumb': util.get_image_path('cnbcPakistan.png'),
+            },
+            {'label': 'Samaa News',
+             'id': '31',
+             'thumb': util.get_image_path('samaa.png'),
+            },
+        ])
+
+    category_ramzan = s.category('Browse Ramzan Shows',
+        [
+            {'label': 'Ramzan TV Shows',
+             'id': '375',
+            },
+            {'label': 'Ramzan Cooking Shows',
+             'id': '376',
+            },
+            {'label': 'Ramzan Special Dramas & Telefilms',
+             'id': '400',
+            },
+        ])
+
     categories = {
-        'drama' : category_drama
+        'drama' : category_drama,
+        'morning': category_morning,
+        'news': category_news,
+        'ramzan': category_ramzan,
     }
 
     frames = [
@@ -108,7 +170,7 @@ class ThePakTvApi(BaseForum):
     def get_subforum_id(self, url):
         id = None
         if url:
-            f = re.compile('f(\d+)').findall(url)
+            f = re.compile('(?:\?f=|\/f)(\d+)').findall(url)
             if f:
                 id = f[0]
         return id
@@ -140,8 +202,8 @@ class ThePakTvApi(BaseForum):
         h = sub.findAll('li')
         linklist = self.get_parents(h)
 
+        channels = []
         shows = []
-        episodes = []
 
         if linklist and len(linklist) > 0:
             for l in linklist:
@@ -156,11 +218,11 @@ class ThePakTvApi(BaseForum):
                 }
 
                 if (l.get('data-has-children')):
-                    shows.append(data)
+                    channels.append(data)
                 else:
-                    episodes.append(data)
+                    shows.append(data)
 
-        return shows, episodes
+        return channels, shows
 
 
     def get_frame_menu(self):
