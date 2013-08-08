@@ -1,27 +1,36 @@
 import resources.lib.util as util
 
-class category():
+class Category():
     def __init__(self, label, channels):
         self.label = label
         self.channels = channels
 
-class channel():
+
+class Channel():
     def __init__(self, id, label, thumb=None):
-        self.__id = id
-        self.__label = label
+        self.id = id
+        self.label = label
         self.__thumb = thumb
 
-    def get_id(self):
-        return self.__id
+    def get_thumb(self, default=None):
+        if self.__thumb != None:
+            result = self.__thumb
+        else:
+            result = default if default != None else ''
 
-    def get_label(self):
-        return self.__label
+        return util.get_image_path(result)
+
+
+class Host():
+    def __init__(self, server, label, thumb=None):
+        self.server = server,
+        self.label = label,
+        self.__thumb = thumb
 
     def get_thumb(self, default=None):
-        result = ''
-        if self.__thumb == None:
-            if default != None:
-                result = default
+        if self.__thumb != None:
+            result = self.__thumb
         else:
-            result = util.get_image_path(self.__thumb)
-        return result
+            result = default if default != None else ''
+
+        return util.get_image_path(result)

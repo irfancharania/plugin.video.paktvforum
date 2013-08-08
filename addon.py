@@ -14,8 +14,8 @@ def index():
     items = [{
         'label': sc.long_name,
         'path': plugin.url_for('get_category_menu', siteid=index, cls=sc.__name__),
-        'thumbnail': sc.local_thumb,
-        'icon': sc.local_thumb,
+        'thumbnail': util.get_image_path(sc.local_thumb),
+        'icon': util.get_image_path(sc.local_thumb),
         } for index, sc in enumerate(BaseForum.__subclasses__())]
 
 
@@ -92,11 +92,11 @@ def browse_category(cls, categoryid):
     plugin.log.debug('browse category: {category}'.format(category=categoryid))
 
     items = [{
-        'label': item['label'],
-        'thumbnail': item.get('thumb', api.local_thumb),
-        'icon': item.get('thumb', api.local_thumb),
+        'label': item.label,
+        'thumbnail': item.get_thumb(api.local_thumb),
+        'icon': item.get_thumb(api.local_thumb),
         'path': plugin.url_for('browse_channels', siteid=siteid, cls=cls,
-            channelid=item['id'])
+            channelid=item.id)
     } for item in api.get_channel_menu(categoryid)]
 
     by_label = itemgetter('label')
@@ -193,4 +193,5 @@ if __name__ == '__main__':
     try:
         plugin.run()
     except Exception, e:
+        plugin.log.error(e)
         plugin.notify(msg=e)

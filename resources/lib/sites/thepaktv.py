@@ -5,6 +5,7 @@ import resources.lib.util as util
 import re
 import HTMLParser
 import resources.lib.structure as s
+import resources.lib.hosts as hosts
 
 #import logging
 #logging.basicConfig(level=logging.DEBUG)
@@ -12,117 +13,50 @@ import resources.lib.structure as s
 class ThePakTvApi(BaseForum):
     short_name = 'thepaktv'
     long_name = 'The PakTV Forum'
-    local_thumb = util.get_image_path('thumb_paktv.png')
+    local_thumb = 'thumb_paktv.png'
     base_url = 'http://www.thepaktv.me/forums/'
 
     section_url_template = 'forumdisplay.php?f='
 
 ###############################################
-    category_drama = s.category('Browse Pakistani Dramas',
+    category_drama = s.Category('Browse Pakistani Dramas',
         [
-            {'label': 'Geo',
-             'id': '16',
-             'thumb': util.get_image_path('geo.png'),
-            },
-            {'label': 'Ary Digital',
-             'id': '18',
-             'thumb': util.get_image_path('ary.png'),
-            },
-            {'label': 'Hum TV',
-             'id': '17',
-             'thumb': util.get_image_path('hum.png'),
-            },
-            {'label': 'PTV Home',
-             'id': '15',
-             'thumb': util.get_image_path('ptv.png'),
-            },
-            {'label': 'Urdu 1',
-             'id': '954',
-             'thumb': util.get_image_path('urdu1.png'),
-            },
-            {'label': 'Geo Kahani',
-             'id': '1118',
-             'thumb': util.get_image_path('geoKahani.png'),
-            },
-            {'label': 'A Plus',
-             'id': '24',
-             'thumb': util.get_image_path('aplus.png'),
-            },
-            {'label': 'TV One',
-             'id': '19',
-             'thumb': util.get_image_path('tv1.png'),
-            },
-            {'label': 'Express Entertainment',
-             'id': '619',
-             'thumb': util.get_image_path('expressEntertainment.png'),
-            },
-            {'label': 'ARY Musik',
-             'id': '25',
-             'thumb': util.get_image_path('aryMusik.png'),
-            },
-            {'label': 'ATV',
-             'id': '23',
-             'thumb': util.get_image_path('atv.png'),
-            }
+            s.Channel('16', 'Geo', 'geo.png'),
+            s.Channel('18', 'Ary Digital', 'ary.png'),
+            s.Channel('17', 'Hum TV', 'hum.png'),
+            s.Channel('15', 'PTV Home', 'ptv.png'),
+            s.Channel('954', 'Urdu 1', 'urdu1.png'),
+            s.Channel('1118', 'Geo Kahani', 'geoKahani.png'),
+            s.Channel('24', 'A Plus', 'aplus.png'),
+            s.Channel('19', 'TV One', 'tv1.png'),
+            s.Channel('619', 'Express Entertainment', 'expressEntertainment.png'),
+            s.Channel('25', 'ARY Musik', 'aryMusik.png'),
+            s.Channel('23', 'ATV', 'atv.png'),
         ])
 
-    category_morning = s.category('Browse Morning/Cooking Shows',
+    category_morning = s.Category('Browse Morning/Cooking Shows',
         [
-            {'label': 'Morning Shows',
-             'id': '286',
-            },
-            {'label': 'Cooking Shows',
-             'id': '141',
-            },
+            s.Channel('286', 'Morning Shows'),
+            s.Channel('141', 'Cooking Shows'),
         ])
 
-    category_news = s.category('Browse Current Affairs Talk Shows',
+    category_news = s.Category('Browse Current Affairs Talk Shows',
         [
-            {'label': 'Geo News',
-             'id': '26',
-             'thumb': util.get_image_path('geoNews.png'),
-            },
-            {'label': 'Express News',
-             'id': '27',
-             'thumb': util.get_image_path('expressNews.png'),
-            },
-            {'label': 'Dunya TV',
-             'id': '29',
-             'thumb': util.get_image_path('dunya.png'),
-            },
-            {'label': 'AAJ News',
-             'id': '28',
-             'thumb': util.get_image_path('aaj.png'),
-            },
-            {'label': 'Dawn News',
-             'id': '53',
-             'thumb': util.get_image_path('dawn.png'),
-            },
-            {'label': 'Ary News',
-             'id': '30',
-             'thumb': util.get_image_path('aryNews.png'),
-            },
-            {'label': 'CNBC Pakistan',
-             'id': '735',
-             'thumb': util.get_image_path('cnbcPakistan.png'),
-            },
-            {'label': 'Samaa News',
-             'id': '31',
-             'thumb': util.get_image_path('samaa.png'),
-            },
+            s.Channel('26', 'Geo News', 'geoNews.png'),
+            s.Channel('27', 'Express News', 'expressNews.png'),
+            s.Channel('29', 'Dunya TV', 'dunya.png'),
+            s.Channel('28', 'AAJ News', 'aaj.png'),
+            s.Channel('53', 'Dawn News', 'dawn.png'),
+            s.Channel('30', 'Ary News', 'aryNews.png'),
+            s.Channel('735', 'CNBC Pakistan', 'cnbcPakistan.png'),
+            s.Channel('31', 'Samaa News', 'samaa.png'),
         ])
 
-    category_ramzan = s.category('Browse Ramzan Shows',
+    category_ramzan = s.Category('Browse Ramzan Shows',
         [
-            {'label': 'Ramzan TV Shows',
-             'id': '375',
-            },
-            {'label': 'Ramzan Cooking Shows',
-             'id': '376',
-            },
-            {'label': 'Ramzan Special Dramas & Telefilms',
-             'id': '400',
-            },
+            s.Channel('375', 'Ramzan TV Shows'),
+            s.Channel('376', 'Ramzan Cooking Shows'),
+            s.Channel('400', 'Ramzan Special Dramas & Telefilms'),
         ])
 
     categories = {
@@ -132,6 +66,7 @@ class ThePakTvApi(BaseForum):
         'ramzan': category_ramzan,
     }
 
+###############################################
     frames = [
         {   'label': 'Today\'s Top Dramas',
             'url': 'http://www.paktvnetwork.com/Ads/forum/update3/Today/6.html',
@@ -152,6 +87,18 @@ class ThePakTvApi(BaseForum):
             'url': 'http://www.paktvnetwork.com/Ads/forum/update3/Today/ramadan.html',
         },
     ]
+
+###############################################
+    match_string = {
+        'tube.php': hosts.youtube,
+        'daily.php': hosts.dailymotion,
+        'hb.php': hosts.hostingbulk,
+        'tune.php': hosts.tunepk,
+        'vw.php': hosts.videoweed,
+        'fb.php': hosts.facebook,
+        'nowvideo.php': hosts.nowvideo,
+        'put.php': hosts.putlocker,
+    }
 
 ###############################################
 
