@@ -1,4 +1,3 @@
-import abc
 from resources.lib.abc_base import BaseForum
 from BeautifulSoup import BeautifulSoup
 import resources.lib.util as util
@@ -10,6 +9,7 @@ import resources.lib.hosts as hosts
 #import logging
 #logging.basicConfig(level=logging.DEBUG)
 
+
 class ThePakTvApi(BaseForum):
     short_name = 'thepaktv'
     long_name = 'The PakTV Forum'
@@ -19,48 +19,44 @@ class ThePakTvApi(BaseForum):
     section_url_template = 'forumdisplay.php?f='
 
 ###############################################
-    category_drama = s.Category('Browse Pakistani Dramas',
-        [
-            s.Channel('16', 'Geo', 'geo.png'),
-            s.Channel('18', 'Ary Digital', 'ary.png'),
-            s.Channel('17', 'Hum TV', 'hum.png'),
-            s.Channel('15', 'PTV Home', 'ptv.png'),
-            s.Channel('954', 'Urdu 1', 'urdu1.png'),
-            s.Channel('1118', 'Geo Kahani', 'geoKahani.png'),
-            s.Channel('24', 'A Plus', 'aplus.png'),
-            s.Channel('19', 'TV One', 'tv1.png'),
-            s.Channel('619', 'Express Entertainment', 'expressEntertainment.png'),
-            s.Channel('25', 'ARY Musik', 'aryMusik.png'),
-            s.Channel('23', 'ATV', 'atv.png'),
-        ])
+    category_drama = s.Category('Browse Pakistani Dramas', [
+        s.Channel('16', 'Geo', 'geo.png'),
+        s.Channel('18', 'Ary Digital', 'ary.png'),
+        s.Channel('17', 'Hum TV', 'hum.png'),
+        s.Channel('15', 'PTV Home', 'ptv.png'),
+        s.Channel('954', 'Urdu 1', 'urdu1.png'),
+        s.Channel('1118', 'Geo Kahani', 'geoKahani.png'),
+        s.Channel('24', 'A Plus', 'aplus.png'),
+        s.Channel('19', 'TV One', 'tv1.png'),
+        s.Channel('619', 'Express Entertainment', 'expressEntertainment.png'),
+        s.Channel('25', 'ARY Musik', 'aryMusik.png'),
+        s.Channel('23', 'ATV', 'atv.png'),
+    ])
 
-    category_morning = s.Category('Browse Morning/Cooking Shows',
-        [
-            s.Channel('286', 'Morning Shows', 'morning.jpg'),
-            s.Channel('141', 'Cooking Shows', 'cooking.jpg'),
-        ])
+    category_morning = s.Category('Browse Morning/Cooking Shows', [
+        s.Channel('286', 'Morning Shows', 'morning.jpg'),
+        s.Channel('141', 'Cooking Shows', 'cooking.jpg'),
+    ])
 
-    category_news = s.Category('Browse Current Affairs Talk Shows',
-        [
-            s.Channel('26', 'Geo News', 'geoNews.png'),
-            s.Channel('27', 'Express News', 'expressNews.png'),
-            s.Channel('29', 'Dunya TV', 'dunya.png'),
-            s.Channel('28', 'AAJ News', 'aaj.png'),
-            s.Channel('53', 'Dawn News', 'dawn.png'),
-            s.Channel('30', 'Ary News', 'aryNews.png'),
-            s.Channel('735', 'CNBC Pakistan', 'cnbcPakistan.png'),
-            s.Channel('31', 'Samaa News', 'samaa.png'),
-        ])
+    category_news = s.Category('Browse Current Affairs Talk Shows', [
+        s.Channel('26', 'Geo News', 'geoNews.png'),
+        s.Channel('27', 'Express News', 'expressNews.png'),
+        s.Channel('29', 'Dunya TV', 'dunya.png'),
+        s.Channel('28', 'AAJ News', 'aaj.png'),
+        s.Channel('53', 'Dawn News', 'dawn.png'),
+        s.Channel('30', 'Ary News', 'aryNews.png'),
+        s.Channel('735', 'CNBC Pakistan', 'cnbcPakistan.png'),
+        s.Channel('31', 'Samaa News', 'samaa.png'),
+    ])
 
-    category_ramzan = s.Category('Browse Ramzan Shows',
-        [
-            s.Channel('375', 'Ramzan TV Shows'),
-            s.Channel('376', 'Ramzan Cooking Shows'),
-            s.Channel('400', 'Ramzan Special Dramas & Telefilms'),
-        ])
+    category_ramzan = s.Category('Browse Ramzan Shows', [
+        s.Channel('375', 'Ramzan TV Shows'),
+        s.Channel('376', 'Ramzan Cooking Shows'),
+        s.Channel('400', 'Ramzan Special Dramas & Telefilms'),
+    ])
 
     categories = {
-        'drama' : category_drama,
+        'drama': category_drama,
         'morning': category_morning,
         'news': category_news,
         'ramzan': category_ramzan,
@@ -68,25 +64,18 @@ class ThePakTvApi(BaseForum):
 
 ###############################################
     frames = [
-        {   'label': 'Today\'s Top Dramas',
-            'url': 'http://www.paktvnetwork.com/Ads/forum/update3/Today/6.html',
-        },
-        {   'label': 'Today\'s Talk Shows',
-            'url': 'http://www.paktvnetwork.com/Ads/forum/update3/Shows/5.html',
-        },
-        {   'label': 'Morning Shows',
-            'url': 'http://www.paktvnetwork.com/Ads/forum/update3/MorningShows.html',
-        },
-        {   'label': 'Hit Dramas',
-            'url': 'http://www.paktvnetwork.com/Ads/forum/update3/HitDramas.html',
-        },
-        {   'label': 'New Arrivals',
-            'url': 'http://www.paktvnetwork.com/Ads/forum/update3/newdramas.html',
-        },
-        {   'label': 'Ramdan Kareem Programs',
-            'url': 'http://www.paktvnetwork.com/Ads/forum/update3/Today/ramadan.html',
-        },
-    ]
+        {'label': 'Today\'s Top Dramas',
+         'url': 'http://www.paktvnetwork.com/Ads/forum/update3/Today/6.html'},
+        {'label': 'Today\'s Talk Shows',
+         'url': 'http://www.paktvnetwork.com/Ads/forum/update3/Shows/5.html'},
+        {'label': 'Morning Shows',
+         'url': 'http://www.paktvnetwork.com/Ads/forum/update3/MorningShows.html'},
+        {'label': 'Hit Dramas',
+         'url': 'http://www.paktvnetwork.com/Ads/forum/update3/HitDramas.html'},
+        {'label': 'New Arrivals',
+         'url': 'http://www.paktvnetwork.com/Ads/forum/update3/newdramas.html'},
+        {'label': 'Ramdan Kareem Programs',
+         'url': 'http://www.paktvnetwork.com/Ads/forum/update3/Today/ramadan.html'}]
 
 ###############################################
     match_string = {
@@ -103,16 +92,14 @@ class ThePakTvApi(BaseForum):
 ###############################################
 
     def get_category_menu(self):
-        items = [
-            { 'label': value.label,
-              'categoryid': key
+        items = [{
+            'label': value.label,
+            'categoryid': key
             } for key, value in self.categories.items()]
         return items
 
-
     def get_channel_menu(self, categoryid):
         return self.categories[categoryid].channels
-
 
     def get_subforum_id(self, url):
         id = None
@@ -121,7 +108,6 @@ class ThePakTvApi(BaseForum):
             if f:
                 id = f[0]
         return id
-
 
     def get_parents(self, linklist):
         '''identify forum sections/subsections'''
@@ -136,16 +122,17 @@ class ThePakTvApi(BaseForum):
 
         return newlist
 
-
     def get_show_menu(self, channelid):
-        url = '{base}{section}{id}'.format(base=self.base_url,
-                        section=self.section_url_template,
-                        id=channelid)
+        url = '{base}{section}{id}'.format(
+            base=self.base_url,
+            section=self.section_url_template,
+            id=channelid)
 
         data = util.get_remote_data(url)
         soup = BeautifulSoup(data, convertEntities=BeautifulSoup.HTML_ENTITIES)
 
-        sub = soup.find('ul', attrs={'data-role': 'listview', 'data-theme': 'd', 'class': 'forumbits'})
+        sub = soup.find('ul', attrs={
+            'data-role': 'listview', 'data-theme': 'd', 'class': 'forumbits'})
         h = sub.findAll('li')
         linklist = self.get_parents(h)
 
@@ -171,10 +158,8 @@ class ThePakTvApi(BaseForum):
 
         return channels, shows
 
-
     def get_frame_menu(self):
         return self.frames
-
 
     def browse_frame(self, url):
         data = util.get_remote_data(url)
@@ -198,15 +183,6 @@ class ThePakTvApi(BaseForum):
             })
         sorted_items = sorted(items, key=lambda item: item['label'])
         return sorted_items
-
-
-    def browse_channels(self):
-        pass
-
-
-    def browse_shows(self):
-        pass
-
 
     def get_episode_menu(self, url, page=1):
         ''' Get episodes for specified show '''
@@ -243,14 +219,12 @@ class ThePakTvApi(BaseForum):
 
 ###########################################################################
 
-
-
     def get_episode_data(self, url):
         data = util.get_remote_data(url)
         soup = BeautifulSoup(data, convertEntities=BeautifulSoup.HTML_ENTITIES)
 
-        linklist = soup.find('ol', id='posts').find('blockquote', "postcontent restore").findAll('a')
-
+        linklist = soup.find('ol', id='posts').find(
+            'blockquote', "postcontent restore").findAll('a')
 
         util.clean_post_links(linklist)
         items = []
@@ -270,8 +244,6 @@ class ThePakTvApi(BaseForum):
                     'vid': vid
                 })
         return items
-
-
 
     def play_video(self):
         pass

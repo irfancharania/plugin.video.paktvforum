@@ -1,4 +1,4 @@
-import resources.lib.structure as s
+import resources.lib.util as util
 
 
 class Host():
@@ -8,10 +8,10 @@ class Host():
         self.__thumb = thumb
 
     def get_thumb(self, default=None):
-        if self.__thumb != None:
+        if self.__thumb is not None:
             result = self.__thumb
         else:
-            result = default if default != None else ''
+            result = default if default is not None else ''
 
         return util.get_image_path(result)
 

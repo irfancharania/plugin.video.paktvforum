@@ -1,4 +1,4 @@
-import requests, re
+import requests
 from xbmcswift2 import xbmcaddon
 
 
@@ -11,7 +11,8 @@ user_agent_desktop = 'Mozilla/5.0 (Windows NT 6.1; WOW64; rv:23.0) Gecko/2013040
 def get_image_path(image):
     ''' get image path '''
     addon_id = 'plugin.video.paktvforum'
-    image = 'special://home/addons/{id}/resources/images/{image}'.format(id=addon_id, image=image)
+    image = 'special://home/addons/{id}/resources/images/{image}'.format(
+        id=addon_id, image=image)
     return image
 
 
@@ -19,7 +20,7 @@ def get_remote_data(url, ismobile=True):
     ''' fetch website data as mobile or desktop browser'''
     user_agent = user_agent_mobile if ismobile else user_agent_desktop
 
-    headers = { 'User-Agent': user_agent }
+    headers = {'User-Agent': user_agent}
     r = requests.get(url, headers=headers)
     return r.content
 
@@ -31,7 +32,7 @@ def is_site_available(url):
         return r.status_code < 400
 
     except:
-        return false
+        return False
 
 
 def clean_post_links(linklist):

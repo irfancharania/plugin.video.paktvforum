@@ -1,5 +1,6 @@
 import abc
 
+
 class BaseForum(object):
     __metaclass__ = abc.ABCMeta
 

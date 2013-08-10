@@ -9,15 +9,17 @@ from operator import itemgetter
 
 plugin = Plugin()
 
+
 @plugin.route('/')
 def index():
     items = [{
         'label': sc.long_name,
-        'path': plugin.url_for('get_category_menu', siteid=index, cls=sc.__name__),
+        'path': plugin.url_for(
+            'get_category_menu', siteid=index,
+            cls=sc.__name__),
         'thumbnail': util.get_image_path(sc.local_thumb),
         'icon': util.get_image_path(sc.local_thumb),
         } for index, sc in enumerate(BaseForum.__subclasses__())]
-
 
     thumb = util.get_image_path('settings.png')
     items.append({
@@ -66,7 +68,8 @@ def get_category_menu(cls):
     if f:
         frameitems = [{
             'label': item['label'],
-            'path': plugin.url_for('browse_frame', siteid=siteid, cls=cls,
+            'path': plugin.url_for(
+                'browse_frame', siteid=siteid, cls=cls,
                 frameid=index, url=item['url'])
         } for index, item in enumerate(f)]
 
@@ -75,7 +78,8 @@ def get_category_menu(cls):
     if c:
         categoryitems = [{
             'label': '[B]{item}[/B]'.format(item=item['label']),
-            'path': plugin.url_for('browse_category', siteid=siteid, cls=cls,
+            'path': plugin.url_for(
+                'browse_category', siteid=siteid, cls=cls,
                 categoryid=item['categoryid'])
         } for item in c]
 
@@ -95,7 +99,8 @@ def browse_category(cls, categoryid):
         'label': item.label,
         'thumbnail': item.get_thumb(api.local_thumb),
         'icon': item.get_thumb(api.local_thumb),
-        'path': plugin.url_for('browse_channels', siteid=siteid, cls=cls,
+        'path': plugin.url_for(
+            'browse_channels', siteid=siteid, cls=cls,
             channelid=item.id)
     } for item in api.get_channel_menu(categoryid)]
 
@@ -113,7 +118,8 @@ def browse_frame(cls, frameid):
 
     items = [{
         'label': item['label'],
-        'path': plugin.url_for('browse_shows', siteid=siteid, cls=cls,
+        'path': plugin.url_for(
+            'browse_shows', siteid=siteid, cls=cls,
             frameid=frameid, showid=index, showpage=1, url=item['url'])
     } for index, item in enumerate(api.browse_frame(url))]
 
@@ -131,13 +137,15 @@ def browse_channels(cls, channelid):
 
     showitems = [{
         'label': item['label'],
-        'path': plugin.url_for('browse_shows', siteid=siteid, cls=cls,
+        'path': plugin.url_for(
+            'browse_shows', siteid=siteid, cls=cls,
             showid=item['id'], showpage=1, url=item['url'])
     } for item in shows]
 
     channelitems = [{
         'label': '[B]{item}[/B]'.format(item=item['label']),
-        'path': plugin.url_for('browse_channels', siteid=siteid, cls=cls,
+        'path': plugin.url_for(
+            'browse_channels', siteid=siteid, cls=cls,
             channelid=item['id'], url=item['url'])
     } for item in channels]
 
@@ -158,20 +166,23 @@ def browse_shows(cls, showid, showpage=1):
 
     videos, next_url = api.get_episode_menu(url, showpage)
 
-    items= []
+    items = []
 
     if videos:
         items = [{
             'label': item['label'],
-            'path': plugin.url_for('get_episode_data', siteid=siteid, cls=cls,
+            'path': plugin.url_for(
+                'get_episode_data', siteid=siteid, cls=cls,
                 showid=showid, episodeid=index, url=item['url'])
         } for index, item in enumerate(videos)]
 
         if next_url:
             items.append({
                 'label': 'Next >>',
-                'path': plugin.url_for('browse_shows', siteid=siteid,
-                        cls=cls, showid=showid, showpage=str(showpage + 1), url=next_url)
+                'path': plugin.url_for(
+                    'browse_shows', siteid=siteid,
+                    cls=cls, showid=showid, showpage=str(showpage + 1),
+                    url=next_url)
             })
     else:
         ## TODO: Pop up dialog: No episodes found.
@@ -191,8 +202,6 @@ def get_episode_data(cls, showid, episodeid):
         'path': item['url'] + item['vid'],
         'is_playable': True} for item in api.get_episode_data(url)]
     return items
-
-
 
 
 if __name__ == '__main__':
