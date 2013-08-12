@@ -5,9 +5,8 @@ import re
 import HTMLParser
 import resources.lib.structure as s
 import resources.lib.hosts as hosts
-
-#import logging
-#logging.basicConfig(level=logging.DEBUG)
+from resources.lib.post import Post
+from xbmcswift2 import xbmcgui
 
 
 class ThePakTvApi(BaseForum):
@@ -102,19 +101,19 @@ class ThePakTvApi(BaseForum):
         return self.categories[categoryid].channels
 
     def get_subforum_id(self, url):
-        id = None
+        pk = None
         if url:
             f = re.compile('(?:\?f=|\/f)(\d+)').findall(url)
             if f:
-                id = f[0]
-        return id
+                pk = f[0]
+        return pk
 
     def get_parents(self, linklist):
         '''identify forum sections/subsections'''
         newlist = []
 
         for l in linklist:
-            if (l.get('id')):
+            if (l.get('pk')):
                 newlist.append(l)
             else:
                 parent = newlist[-1]
@@ -148,7 +147,7 @@ class ThePakTvApi(BaseForum):
                 data = {
                     'label': tagline,
                     'url': link,
-                    'id': fid
+                    'pk': fid
                 }
 
                 if (l.get('data-has-children')):
@@ -217,33 +216,45 @@ class ThePakTvApi(BaseForum):
 
         return items, next_url
 
-###########################################################################
-
     def get_episode_data(self, url):
+        print 'Get episode data: {url}'.format(url=url)
+
         data = util.get_remote_data(url)
         soup = BeautifulSoup(data, convertEntities=BeautifulSoup.HTML_ENTITIES)
 
         linklist = soup.find('ol', id='posts').find(
             'blockquote', "postcontent restore").findAll('a')
 
-        util.clean_post_links(linklist)
-        items = []
+        # correct links for erroneous formatting
+        cleanlinks = util.clean_post_links(linklist)
 
-        for item in linklist:
-            href = item['href']
-            ltxt = item.text
+        # parse post links
+        p = Post()
 
-            v = href.find('v=')
-            if (v > 0):
-                vid = href[v+2:]
-                tagline = ltxt
+        progress = xbmcgui.DialogProgress()
+        progress.create('[B]Processing found links[/B]')
+        total = len(cleanlinks)
+        current = 0
 
-                items.append({
-                    'label': HTMLParser.HTMLParser().unescape(tagline),
-                    'url': ltxt,
-                    'vid': vid
-                })
+        for url, text in cleanlinks.items():
+            current += 1
+            percent = (current * 100) // total
+            msg = 'Processing {current} of {total}'.format(
+                current=current, total=total)
+            progress.update(percent, '', msg, '')
+
+            if progress.iscanceled():
+                break
+
+            # process here
+            p.add_link(url, text, self.match_string)
+
+        progress.close()
+
+        items = [{
+            'label': HTMLParser.HTMLParser().unescape(part.text),
+            'partnum': num,
+            'media': part.media
+        } for num, part in p.parts.items()]
+
         return items
-
-    def play_video(self):
-        pass
