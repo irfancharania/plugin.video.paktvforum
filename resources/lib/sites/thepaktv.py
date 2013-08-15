@@ -113,13 +113,24 @@ class ThePakTvApi(BaseForum):
         newlist = []
 
         for l in linklist:
-            if (l.get('pk')):
+            if (l.get('id')):
                 newlist.append(l)
             else:
                 parent = newlist[-1]
                 parent['data-has-children'] = True
 
         return newlist
+
+    # For some reason the fetched request
+    # doesn't contain new icons for posts.
+    # Also, it doesn't tell me that these are newer
+    # from the last time I opened this addon
+    # maybe I need to be logged in for that...
+    def has_new_episodes(self, listitem):
+        if ((listitem.img['src'].find('new') > 0) or
+            (listitem.a.img)):
+            return True
+        return False
 
     def get_show_menu(self, channelid):
         url = '{base}{section}{id}'.format(
@@ -147,7 +158,7 @@ class ThePakTvApi(BaseForum):
                 data = {
                     'label': tagline,
                     'url': link,
-                    'pk': fid
+                    'pk': fid,
                 }
 
                 if (l.get('data-has-children')):

@@ -2,18 +2,18 @@ import resources.lib.util as util
 
 
 class Host():
+    __thumb = ''
+
     def __init__(self, server, label, thumb=None):
-        self.server = server,
-        self.label = label,
-        self.__thumb = thumb
+        self.server = server
+        self.label = label
 
-    def get_thumb(self, default=None):
-        if self.__thumb is not None:
-            result = self.__thumb
-        else:
-            result = default if default is not None else ''
+        if thumb:
+            self.__thumb = thumb
 
-        return util.get_image_path(result)
+    @property
+    def thumb(self):
+        return self.__thumb
 
 
 ''' Resolvable Hosts '''

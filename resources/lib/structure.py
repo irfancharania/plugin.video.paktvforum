@@ -8,15 +8,7 @@ class Category():
 
 
 class Channel():
-    def __init__(self, id, label, thumb=None):
+    def __init__(self, id, label, thumb=''):
         self.id = id
         self.label = label
-        self.__thumb = thumb
-
-    def get_thumb(self, default=None):
-        if self.__thumb is not None:
-            result = self.__thumb
-        else:
-            result = default if default is not None else ''
-
-        return util.get_image_path(result)
+        self.thumb = thumb

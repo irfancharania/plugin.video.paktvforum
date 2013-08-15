@@ -4,6 +4,13 @@ import abc
 class BaseForum(object):
     __metaclass__ = abc.ABCMeta
 
+    short_name = 'base'
+    long_name = 'Base Forum'
+    local_thumb = ''
+    base_url = ''
+
+###############################################
+
 '''
     @abc.abstractmethod
     def browse_channels(self):

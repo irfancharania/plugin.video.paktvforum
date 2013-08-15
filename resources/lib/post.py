@@ -98,8 +98,10 @@ class Post():
                     # add to parts dictionary
                     part = self.parts.get(partnum, None)
                     if part:
+                        ''' append media to existing part '''
                         part.add_media(host, vid)
                     else:
+                        ''' add new part to new part number '''
                         self.parts[partnum] = Part(partnum, host, vid, text)
                 else:
                     print '{addon}: No video id found for {url}'.format(

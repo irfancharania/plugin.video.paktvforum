@@ -2,7 +2,7 @@ import requests
 
 
 # allows us to get mobile version
-user_agent_mobile = 'Mozilla/5.0 (iPhone; U; CPU iPhone OS 4_2_1 like Mac OS X; en-us) AppleWebKit/533.17.9 (KHTML, like Gecko) Version/5.0.2 Mobile/8G4 Safari/6533.18.5'
+user_agent_mobile = 'Mozilla/5.0 (iPhone; CPU iPhone OS 5_0 like Mac OS X) AppleWebKit/534.46 (KHTML, like Gecko) Version/5.1 Mobile/9A334 Safari/7534.48.3'
 
 user_agent_desktop = 'Mozilla/5.0 (Windows NT 6.1; WOW64; rv:23.0) Gecko/20130406 Firefox/23.0'
 
@@ -39,6 +39,7 @@ def clean_post_links(linklist):
     ''' There are a lot of mal-formed links
     e.g. <a href='link1'>part of </a><a href='link1'>text</a>
     This method will merge them into a unique dictionary
+    and concatenate texts associated with each url
     '''
     tag_dic = {}
 

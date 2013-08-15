@@ -1,4 +1,4 @@
-from xbmcswift2 import Plugin
+from xbmcswift2 import Plugin, xbmcgui
 from resources.lib.abc_base import BaseForum
 from resources.lib.sites import *
 import resources.lib.util as util
@@ -96,8 +96,8 @@ def browse_category(cls, categoryid):
 
     items = [{
         'label': item.label,
-        'thumbnail': item.get_thumb(api.local_thumb),
-        'icon': item.get_thumb(api.local_thumb),
+        'thumbnail': item.thumb,
+        'icon': item.thumb,
         'path': plugin.url_for(
             'browse_channels', siteid=siteid, cls=cls,
             channelid=item.id)
@@ -214,12 +214,12 @@ def play_video(cls, showid, epid, partnum):
     print part_media
 
     import urlresolver
-    for host, vid in part_media:
+    for host, vid in sorted(part_media, key=lambda x: x[0].server):
         print '--'*22
-        print host.server[0]
+        print host.server
         print vid
         r = urlresolver.HostedMediaFile(
-            host=host.server[0], media_id=vid)
+            host=host.server, media_id=vid)
         if r:
             media.append(r)
 
@@ -228,20 +228,24 @@ def play_video(cls, showid, epid, partnum):
     print '**::'*22
 
     source = urlresolver.choose_source(media)
+    print '----->>>>>> source'
     print source
 
     if source:
+        print 'RESOLVING URL'
         url = source.resolve()
+        print '----->>>>>> url'
         print url
         plugin.log.debug('play video: {url}'.format(url=url))
 
         plugin.set_resolved_url(url)
 
     else:
-        msg = 'No playable streams found'
+        msg = 'Unable to play video'
         plugin.log.error(msg)
-        plugin.notify(msg)
 
+        dialog = xbmcgui.Dialog()
+        dialog.ok(msg, 'Please choose another source')
 
 if __name__ == '__main__':
     try:
