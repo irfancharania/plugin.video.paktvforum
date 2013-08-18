@@ -27,6 +27,9 @@ def get_remote_data(url, ismobile=True):
 
 def is_site_available(url):
     ''' ping site to see if it is up '''
+
+    print 'Checking url: {url}'.format(url=url)
+
     try:
         r = requests.head(url)
         return r.status_code < 400
@@ -51,6 +54,6 @@ def clean_post_links(linklist):
             if not (key in tag_dic):
                 tag_dic[key] = value
             else:
-                tag_dic[key] = tag_dic[key], value
+                tag_dic[key] = tag_dic[key] + ' ' + value
 
     return tag_dic

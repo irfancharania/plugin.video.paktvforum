@@ -22,8 +22,11 @@ class Part():
 
 
 class Post():
-    def __init__(self):
+    __warningmsg = '{addon}: **WARNING** No {item} found for {url}'
+
+    def __init__(self, matchstr):
         self.parts = {}
+        self.__matchstr = matchstr
 
     def __get_part_text(self, partnum):
         if partnum > 0:
@@ -40,13 +43,14 @@ class Post():
     #        media_id=vid,
     #        title=text)
 
-    def __get_video_id(self, url):
+    def __get_video_id(self, url, vidstr):
         '''
         get video id from url
         '''
-        v = url.find('v=')
+        v = url.find(vidstr)
+        vid = None
         if (v > 0):
-            vid = url[v+2:]
+            vid = url[v+len(vidstr):]
         return vid
 
     def __get_match_string(self, text):
@@ -69,7 +73,7 @@ class Post():
             return int(p[0])
         return 0
 
-    def add_link(self, posturl, urltext, matchstr):
+    def add_link(self, posturl, urltext):
         '''
         parse links from forum post
         add to local parts dictionary
@@ -80,15 +84,16 @@ class Post():
         # parse posturl to get matchstr
         match = self.__get_match_string(posturl)
         if match:
-            #print 'Match string: {match}'.format(match=match)
+            print 'Match string: {match}'.format(match=match)
 
             # get host from local match string dictionary
-            host = matchstr.get(match)
+            host, vidstr = self.__matchstr.get(match) or (None, None)
             if host:
-                #print 'Host found: {host}'.format(host=host.label)
+                #print 'Host found: {host}, {vidstr}'.format(
+                #    host=host.label, vidstr=vidstr)
 
                 # get video id
-                vid = self.__get_video_id(posturl)
+                vid = self.__get_video_id(posturl, vidstr)
                 if vid:
                     #print 'Video ID: {vid}'.format(vid=vid)
 
@@ -104,11 +109,11 @@ class Post():
                         ''' add new part to new part number '''
                         self.parts[partnum] = Part(partnum, host, vid, text)
                 else:
-                    print '{addon}: No video id found for {url}'.format(
-                        addon=util.addon_id, url=posturl)
+                    print self.__warningmsg.format(
+                        addon=util.addon_id, item='video id', url=posturl)
             else:
-                print '{addon}: No host found for {url}'.format(
-                    addon=util.addon_id, url=posturl)
+                print self.__warningmsg.format(
+                    addon=util.addon_id, item='host', url=posturl)
         else:
-            print '{addon}: No match found for {url}'.format(
-                addon=util.addon_id, url=posturl)
+            print self.__warningmsg.format(
+                addon=util.addon_id, item='match', url=posturl)

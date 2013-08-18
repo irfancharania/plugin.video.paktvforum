@@ -2,17 +2,15 @@ import resources.lib.util as util
 
 
 class Host():
-    __thumb = ''
-
-    def __init__(self, server, label, thumb=None):
+    def __init__(self, server, label, thumb=''):
         self.server = server
         self.label = label
-
-        if thumb:
-            self.__thumb = thumb
+        self.__thumb = thumb
 
     @property
     def thumb(self):
+        if self.__thumb:
+            self.__thumb = util.get_image_path(self.__thumb)
         return self.__thumb
 
 

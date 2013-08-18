@@ -8,91 +8,79 @@ from resources.lib.post import Post
 from xbmcswift2 import xbmcgui
 
 
-class ThePakTvApi(BaseForum):
-    short_name = 'thepaktv'
-    long_name = 'The PakTV Forum'
-    local_thumb = 'thumb_paktv.png'
-    base_url = 'http://www.thepaktv.me/forums/'
-    sub_id_regex = '(?:\?f=|\/f|\?t=)(\d+)'
+class DesiRonakApi(BaseForum):
+    short_name = 'desironak'
+    long_name = 'Desi Ronak Forum'
+    local_thumb = 'thumb_desironak.png'
+    base_url = 'http://www.desironak.com/forums/'
+    sub_id_regex = '\?(\d+)\-'
 
-    section_url_template = 'forumdisplay.php?f='
+    section_url_template = 'forumdisplay.php?'
+    thread_url_template = 'showthread.php?'
 
 ###############################################
     category_drama = s.Category('Browse Pakistani Dramas', [
-        s.Channel('16', 'Geo', 'geo.png'),
-        s.Channel('18', 'Ary Digital', 'ary.png'),
-        s.Channel('17', 'Hum TV', 'hum.png'),
-        s.Channel('15', 'PTV Home', 'ptv.png'),
-        s.Channel('954', 'Urdu 1', 'urdu1.png'),
-        s.Channel('1118', 'Geo Kahani', 'geoKahani.png'),
-        s.Channel('24', 'A Plus', 'aplus.png'),
-        s.Channel('19', 'TV One', 'tv1.png'),
-        s.Channel('619', 'Express Entertainment', 'expressEntertainment.png'),
-        s.Channel('25', 'ARY Musik', 'aryMusik.png'),
-        s.Channel('23', 'ATV', 'atv.png'),
+        s.Channel('30', 'Geo', 'geo.png'),
+        s.Channel('29', 'Ary Digital', 'ary.png'),
+        s.Channel('31', 'Hum TV', 'hum.png'),
+        s.Channel('460', 'PTV Home', 'ptv.png'),
+        s.Channel('1182', 'Urdu 1', 'urdu1.png'),
+        s.Channel('1328', 'Geo Kahani', 'geoKahani.png'),
+        s.Channel('277', 'A Plus', 'aplus.png'),
+        s.Channel('578', 'TV One', 'tv1.png'),
+        s.Channel('779', 'Express Entertainment',
+                  'expressEntertainment.png'),
+        s.Channel('229', 'ARY Musik', 'aryMusik.png'),
+        s.Channel('563', 'ATV', 'atv.png'),
+        s.Channel('246', 'Aag TV', 'aag.png'),
     ])
 
     category_morning = s.Category('Browse Morning/Cooking Shows', [
-        s.Channel('286', 'Morning Shows', 'morning.png'),
-        s.Channel('141', 'Cooking Shows', 'cooking.png'),
+        s.Channel('454', 'Morning Shows', 'morning.png'),
+        s.Channel('33', 'Cooking Shows', 'cooking.png'),
+    ])
+
+    category_telefilms = s.Category('Browse Stage Dramas/Telefilms/Special Events', [
+        s.Channel('235', 'Family Stage Dramas'),
+        s.Channel('62', 'Telefilms'),
+        s.Channel('88', 'Events'),
     ])
 
     category_news = s.Category('Browse Current Affairs Talk Shows', [
-        s.Channel('26', 'Geo News', 'geoNews.png'),
-        s.Channel('27', 'Express News', 'expressNews.png'),
-        s.Channel('29', 'Dunya TV', 'dunya.png'),
-        s.Channel('28', 'AAJ News', 'aaj.png'),
-        s.Channel('53', 'Dawn News', 'dawn.png'),
-        s.Channel('30', 'Ary News', 'aryNews.png'),
-        s.Channel('735', 'CNBC Pakistan', 'cnbcPakistan.png'),
-        s.Channel('31', 'Samaa News', 'samaa.png'),
-    ])
-
-    category_ramzan = s.Category('Browse Ramzan Shows', [
-        s.Channel('375', 'Ramzan TV Shows'),
-        s.Channel('376', 'Ramzan Cooking Shows'),
-        s.Channel('400', 'Ramzan Special Dramas & Telefilms'),
+        s.Channel('355', 'Geo News', 'geoNews.png'),
+        s.Channel('400', 'Express News', 'expressNews.png'),
+        s.Channel('250', 'Dunya News', 'dunya.png'),
+        s.Channel('394', 'AAJ News', 'aaj.png'),
+        s.Channel('424', 'Dawn News', 'dawn.png'),
+        s.Channel('389', 'Ary News', 'aryNews.png'),
+        s.Channel('1005', 'One News', 'newsone.jpg'),
+        s.Channel('405', 'Samaa News', 'samaa.png'),
     ])
 
     categories = {
         'drama': category_drama,
         'morning': category_morning,
         'news': category_news,
-        'ramzan': category_ramzan,
+        'telefilms': category_telefilms,
     }
 
 ###############################################
     frames = [
-        {'label': 'Today\'s Top Dramas',
-         'url': 'http://www.paktvnetwork.com/Ads/forum/update3/Today/6.html',
-         'containstype': s.ThreadType().Show},
+        {'label': 'Today\'s Dramas',
+         'url': 'http://www.desironak.com/forums/cmps_index.php?pageid=dramas',
+         'moduleid': 'module17',
+         'containstype': s.ThreadType().Episode},
         {'label': 'Today\'s Talk Shows',
-         'url': 'http://www.paktvnetwork.com/Ads/forum/update3/Shows/5.html',
-         'containstype': s.ThreadType().Show},
-        {'label': 'Morning Shows',
-         'url': 'http://www.paktvnetwork.com/Ads/forum/update3/MorningShows.html',
-         'containstype': s.ThreadType().Show},
-        {'label': 'Hit Dramas',
-         'url': 'http://www.paktvnetwork.com/Ads/forum/update3/HitDramas.html',
-         'containstype': s.ThreadType().Show},
-        {'label': 'New Arrivals',
-         'url': 'http://www.paktvnetwork.com/Ads/forum/update3/newdramas.html',
-         'containstype': s.ThreadType().Show},
-        {'label': 'Ramdan Kareem Programs',
-         'url': 'http://www.paktvnetwork.com/Ads/forum/update3/Today/ramadan.html',
-         'containstype': s.ThreadType().Show}]
+         'url': 'http://www.desironak.com/forums/cmps_index.php?pageid=talkshows',
+         'moduleid': 'module16',
+         'containstype': s.ThreadType().Episode},
+    ]
 
 ###############################################
     match_string = {
-        'tube.php': (hosts.youtube, 'v='),
-        'daily.php': (hosts.dailymotion, 'v='),
-        'hb.php': (hosts.hostingbulk, 'v='),
-        'hostingbulk.php': (hosts.hostingbulk, 'v='),
-        'tune.php': (hosts.tunepk, 'v='),
-        'vw.php': (hosts.videoweed, 'v='),
-        'fb.php': (hosts.facebook, 'v='),
-        'nowvideo.php': (hosts.nowvideo, 'v='),
-        'put.php': (hosts.putlocker, 'v='),
+        'youtube.php': (hosts.youtube, 'id='),
+        'dailymotion.php': (hosts.dailymotion, 'id='),
+        'tnpk.php': (hosts.tunepk, 'url='),
     }
 
 ###############################################
@@ -115,30 +103,34 @@ class ThePakTvApi(BaseForum):
         soup = BeautifulSoup(data, convertEntities=BeautifulSoup.HTML_ENTITIES)
 
         frameid = int(frameid)
+        moduleid = self.frames[frameid]['moduleid']
         containstype = self.frames[frameid]['containstype']
 
         items = []
 
-        linklist = soup.findAll('a')
+        linklist = soup.find('div', id=moduleid).findAll('a')
 
         for l in linklist:
             tagline = HTMLParser.HTMLParser().unescape(l.text)
             link = l['href']
+            tid = self.get_sub_id(link)
 
-            fid = self.get_sub_id(link)
-            if fid:
-                link = self.base_url + self.section_url_template + fid
+            if tid:
+                link = self.base_url + self.thread_url_template + tid
 
             items.append({
                 'label': tagline,
                 'url': link,
-                'pk': fid
+                'pk': tid
             })
         sorted_items = sorted(items, key=lambda item: item['label'])
         return sorted_items, containstype
 
     def get_show_menu(self, channelid):
-        url = '{base}{section}{id}'.format(
+        ''' Get shows for specified channel'''
+
+        #styleid=24 == mobile version
+        url = '{base}{section}{id}&styleid=24'.format(
             base=self.base_url,
             section=self.section_url_template,
             id=channelid)
@@ -178,6 +170,8 @@ class ThePakTvApi(BaseForum):
     def get_episode_menu(self, url, page=1):
         ''' Get episodes for specified show '''
 
+        #styleid=24 == mobile version
+        url = url + '&styleid=24'
         data = util.get_remote_data(url)
         soup = BeautifulSoup(data, convertEntities=BeautifulSoup.HTML_ENTITIES)
 
@@ -212,6 +206,9 @@ class ThePakTvApi(BaseForum):
         return items, next_url
 
     def get_episode_data(self, url):
+
+        #styleid=24 == mobile version
+        url = url + '&styleid=24'
         print 'Get episode data: {url}'.format(url=url)
 
         data = util.get_remote_data(url)
