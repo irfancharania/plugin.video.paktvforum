@@ -111,6 +111,7 @@ class ThePakTvApi(BaseForum):
         return self.frames
 
     def browse_frame(self, frameid, url):
+        #print '{name} - fetching {url}'.format(name=self.short_name, url=url)
         data = util.get_remote_data(url)
         soup = BeautifulSoup(data, convertEntities=BeautifulSoup.HTML_ENTITIES)
 

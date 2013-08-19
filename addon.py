@@ -79,11 +79,12 @@ def add_bookmark(item_path):
             item['label'] = groupname + ' - ' + item['label']
 
         bookmarks[item_path] = item
-        bookmarks.sync()
+    else:
+        item = bookmarks[item_path]
 
     dialog = xbmcgui.Dialog()
     dialog.ok('Add Bookmark',
-              'Successfully bookmarked: '
+              'Successfully bookmarked: ',
               '{label}'.format(label=item['label']))
 
 
@@ -99,17 +100,10 @@ def remove_bookmark(item_path):
 
         plugin.log.debug('remove bookmark: {label}'.format(label=label))
 
-        r = plugin.request.args.get('refresh', None)
-        if r:
-            refresh = bool(r[0])
-        else:
-            refresh = False
-
         if item_path in bookmarks:
             del bookmarks[item_path]
             bookmarks.sync()
-            if refresh:
-                xbmc.executebuiltin("Container.Refresh")
+            xbmc.executebuiltin("Container.Refresh")
 
 
 ###############################################
@@ -119,23 +113,14 @@ def __add_listitem(items, groupname=''):
     bookmarks = plugin.get_storage(bookmark_storage)
 
     def context_menu(item_path, groupname):
-        if not item_path in bookmarks:
-            context_menu = [(
-                'Add Bookmark',
-                'XBMC.RunPlugin(%s)' % plugin.url_for(
-                    endpoint='add_bookmark',
-                    item_path=item_path,
-                    groupname=groupname
-                ),
-            )]
-        else:
-            context_menu = [(
-                'Remove Bookmark',
-                'XBMC.RunPlugin(%s)' % plugin.url_for(
-                    endpoint='remove_bookmark',
-                    item_path=item_path
-                ),
-            )]
+        context_menu = [(
+            'Add Bookmark',
+            'XBMC.RunPlugin(%s)' % plugin.url_for(
+                endpoint='add_bookmark',
+                item_path=item_path,
+                groupname=groupname
+            ),
+        )]
         return context_menu
 
     temp = plugin.get_storage(temp_storage)
@@ -144,8 +129,16 @@ def __add_listitem(items, groupname=''):
         temp[item['path']] = item
         item['context_menu'] = context_menu(item['path'], groupname)
     temp.sync()
-
     return items
+
+
+def get_cached(func, *args, **kwargs):
+    '''Return the result of func with the given args and kwargs
+    from cache or execute it if needed'''
+    @plugin.cached(kwargs.pop('TTL', 1440))
+    def wrap(func_name, *args, **kwargs):
+        return func(*args, **kwargs)
+    return wrap(func.__name__, *args, **kwargs)
 
 
 ###############################################
@@ -244,7 +237,7 @@ def browse_frame(siteid, cls, frameid):
 
     # Some forum frames contain shows
     # while others contain episodes
-    contents, contype = api.browse_frame(frameid, url)
+    contents, contype = get_cached(api.browse_frame, frameid, url)
     if contype and contype == s.ThreadType().Episode:
         items = [{
             'label': item['label'],
@@ -270,7 +263,7 @@ def browse_channels(siteid, cls, channelid):
 
     plugin.log.debug('browse channel: {channel}'.format(channel=channelid))
 
-    channels, shows = api.get_show_menu(channelid)
+    channels, shows = get_cached(api.get_show_menu, channelid)
 
     showitems = [{
         'label': item['label'],
@@ -301,7 +294,7 @@ def browse_shows(siteid, cls, showid, showpage=1):
 
     plugin.log.debug('browse show: {show}'.format(show=url))
 
-    videos, next_url = api.get_episode_menu(url, showpage)
+    videos, next_url = get_cached(api.get_episode_menu, url, showpage)
 
     items = []
 
