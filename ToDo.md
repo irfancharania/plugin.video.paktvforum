@@ -1,4 +1,3 @@
-- Add Bookmark
 - Add Caching
 - globalize strings
 - Add Continuous Play

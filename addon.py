@@ -6,19 +6,27 @@ from operator import itemgetter
 import resources.lib.structure as s
 
 
+bookmark_storage = 'my_bookmarks'
+temp_storage = 'temp_storage'
+
 plugin = Plugin()
 
 
 @plugin.route('/')
 def index():
     items = [{
+        'label': '[B]Bookmarks[/B]',
+        'path': plugin.url_for('show_bookmarks'),
+        'thumbnail': util.get_image_path('bookmark.png')}]
+
+    items.extend([{
         'label': sc.long_name,
         'path': plugin.url_for(
             'get_category_menu', siteid=index,
             cls=sc.__name__),
         'thumbnail': util.get_image_path(sc.local_thumb),
         'icon': util.get_image_path(sc.local_thumb),
-        } for index, sc in enumerate(BaseForum.__subclasses__())]
+        } for index, sc in enumerate(BaseForum.__subclasses__())])
 
     thumb = util.get_image_path('settings.png')
     items.append({
@@ -30,17 +38,129 @@ def index():
     return items
 
 
+###############################################
+
+
+@plugin.route('/bookmarks/')
+def show_bookmarks():
+    def context_menu(item_path):
+        context_menu = [(
+            'Remove Bookmark',
+            'XBMC.RunPlugin(%s)' % plugin.url_for('remove_bookmark',
+                                                  item_path=item_path,
+                                                  refresh=True),
+        )]
+        return context_menu
+
+    bookmarks = plugin.get_storage(bookmark_storage)
+    items = bookmarks.values()
+
+    for item in items:
+        item['context_menu'] = context_menu(item['path'])
+    if not items:
+        items = [{
+            'label': '- No Bookmarks -',
+            'path': plugin.url_for('show_bookmarks'),
+        }]
+
+    return plugin.finish(items, sort_methods=['title'])
+
+
+@plugin.route('/bookmarks/add/<item_path>')
+def add_bookmark(item_path):
+    bookmarks = plugin.get_storage(bookmark_storage)
+
+    if not item_path in bookmarks:
+        temp = plugin.get_storage(temp_storage)
+        item = temp[item_path]
+
+        groupname = plugin.request.args['groupname'][0]
+        if groupname:
+            item['label'] = groupname + ' - ' + item['label']
+
+        bookmarks[item_path] = item
+        bookmarks.sync()
+
+    dialog = xbmcgui.Dialog()
+    dialog.ok('Add Bookmark',
+              'Successfully bookmarked: '
+              '{label}'.format(label=item['label']))
+
+
+@plugin.route('/bookmarks/remove/<item_path>')
+def remove_bookmark(item_path):
+    bookmarks = plugin.get_storage(bookmark_storage)
+    label = bookmarks[item_path]['label']
+
+    dialog = xbmcgui.Dialog()
+    if dialog.yesno('Remove Bookmark',
+                    'Are you sure you wish to remove bookmark:',
+                    '{label}'.format(label=label)):
+
+        plugin.log.debug('remove bookmark: {label}'.format(label=label))
+
+        r = plugin.request.args.get('refresh', None)
+        if r:
+            refresh = bool(r[0])
+        else:
+            refresh = False
+
+        if item_path in bookmarks:
+            del bookmarks[item_path]
+            bookmarks.sync()
+            if refresh:
+                xbmc.executebuiltin("Container.Refresh")
+
+
+###############################################
+
+
+def __add_listitem(items, groupname=''):
+    bookmarks = plugin.get_storage(bookmark_storage)
+
+    def context_menu(item_path, groupname):
+        if not item_path in bookmarks:
+            context_menu = [(
+                'Add Bookmark',
+                'XBMC.RunPlugin(%s)' % plugin.url_for(
+                    endpoint='add_bookmark',
+                    item_path=item_path,
+                    groupname=groupname
+                ),
+            )]
+        else:
+            context_menu = [(
+                'Remove Bookmark',
+                'XBMC.RunPlugin(%s)' % plugin.url_for(
+                    endpoint='remove_bookmark',
+                    item_path=item_path
+                ),
+            )]
+        return context_menu
+
+    temp = plugin.get_storage(temp_storage)
+    temp.clear()
+    for item in items:
+        temp[item['path']] = item
+        item['context_menu'] = context_menu(item['path'], groupname)
+    temp.sync()
+
+    return items
+
+
+###############################################
+
+
 @plugin.route('/urlresolver/')
 def get_urlresolver_settings():
     import urlresolver
-
     urlresolver.display_settings()
     return
 
 
-@plugin.route('/sites/<cls>/')
-def get_category_menu(cls):
-    siteid = int(plugin.request.args['siteid'][0])
+@plugin.route('/sites/<siteid>-<cls>/')
+def get_category_menu(siteid, cls):
+    siteid = int(siteid)
     api = BaseForum.__subclasses__()[siteid]()
 
     plugin.log.debug('browse site: {site}'.format(site=cls))
@@ -83,7 +203,7 @@ def get_category_menu(cls):
                 '{site} is unavailable at this time'.format(
                     site=api.long_name),
                 'Please try again later.']
-            plugin.log.error(msg[0])
+            plugin.log.error(msg[1])
 
             dialog = xbmcgui.Dialog()
             dialog.ok(api.long_name, *msg)
@@ -93,10 +213,10 @@ def get_category_menu(cls):
         raise Exception(msg)
 
 
-@plugin.route('/sites/<cls>/category/<categoryid>/')
-def browse_category(cls, categoryid):
-    siteid = int(plugin.request.args['siteid'][0])
-    api = BaseForum.__subclasses__()[int(siteid)]()
+@plugin.route('/sites/<siteid>-<cls>/category/<categoryid>/')
+def browse_category(siteid, cls, categoryid):
+    siteid = int(siteid)
+    api = BaseForum.__subclasses__()[siteid]()
 
     plugin.log.debug('browse category: {category}'.format(category=categoryid))
 
@@ -110,14 +230,15 @@ def browse_category(cls, categoryid):
     } for item in api.get_channel_menu(categoryid)]
 
     by_label = itemgetter('label')
-    return sorted(items, key=by_label)
+    return __add_listitem(groupname=api.short_name,
+                          items=sorted(items, key=by_label))
 
 
-@plugin.route('/sites/<cls>/frames/f<frameid>/')
-def browse_frame(cls, frameid):
-    siteid = int(plugin.request.args['siteid'][0])
+@plugin.route('/sites/<siteid>-<cls>/frames/f<frameid>/')
+def browse_frame(siteid, cls, frameid):
+    siteid = int(siteid)
     url = plugin.request.args['url'][0]
-    api = BaseForum.__subclasses__()[int(siteid)]()
+    api = BaseForum.__subclasses__()[siteid]()
 
     plugin.log.debug('browse frame: {frame}'.format(frame=url))
 
@@ -139,13 +260,13 @@ def browse_frame(cls, frameid):
                 showid=item.get('pk', '0'), showpage=1, url=item['url'])
         } for item in contents]
 
-    return items
+    return __add_listitem(groupname=api.short_name, items=items)
 
 
-@plugin.route('/sites/<cls>/channels/c<channelid>/')
-def browse_channels(cls, channelid):
-    siteid = int(plugin.request.args['siteid'][0])
-    api = BaseForum.__subclasses__()[int(siteid)]()
+@plugin.route('/sites/<siteid>-<cls>/channels/c<channelid>/')
+def browse_channels(siteid, cls, channelid):
+    siteid = int(siteid)
+    api = BaseForum.__subclasses__()[siteid]()
 
     plugin.log.debug('browse channel: {channel}'.format(channel=channelid))
 
@@ -167,14 +288,14 @@ def browse_channels(cls, channelid):
 
     by_label = itemgetter('label')
     items = showitems + sorted(channelitems, key=by_label)
-    return items
+    return __add_listitem(groupname=api.short_name, items=items)
 
 
-@plugin.route('/sites/<cls>/shows/s<showid>/<showpage>/')
-def browse_shows(cls, showid, showpage=1):
-    siteid = int(plugin.request.args['siteid'][0])
+@plugin.route('/sites/<siteid>-<cls>/shows/s<showid>/<showpage>/')
+def browse_shows(siteid, cls, showid, showpage=1):
+    siteid = int(siteid)
     url = plugin.request.args['url'][0]
-    api = BaseForum.__subclasses__()[int(siteid)]()
+    api = BaseForum.__subclasses__()[siteid]()
 
     showpage = int(showpage)
 
@@ -200,20 +321,20 @@ def browse_shows(cls, showid, showpage=1):
                     cls=cls, showid=showid, showpage=str(showpage + 1),
                     url=next_url)
             })
+
+        return __add_listitem(groupname=api.short_name, items=items)
     else:
         msg = '[B][COLOR red]No episodes found.[/COLOR][/B]'
         plugin.log.error(msg)
         dialog = xbmcgui.Dialog()
         dialog.ok(api.long_name, msg)
 
-    return items
 
-
-@plugin.route('/sites/<cls>/episodes/e<epid>/')
-def get_episode_data(cls, epid):
-    siteid = int(plugin.request.args['siteid'][0])
+@plugin.route('/sites/<siteid>-<cls>/episodes/e<epid>/')
+def get_episode_data(siteid, cls, epid):
+    siteid = int(siteid)
     url = plugin.request.args['url'][0]
-    api = BaseForum.__subclasses__()[int(siteid)]()
+    api = BaseForum.__subclasses__()[siteid]()
 
     plugin.log.debug('browse episode: {ep}'.format(ep=url))
 
@@ -235,10 +356,10 @@ def get_episode_data(cls, epid):
         dialog.ok(api.long_name, msg)
 
 
-@plugin.route('/sites/<cls>/episodes/e<epid>/<partnum>')
-def play_video(cls, epid, partnum):
-    siteid = int(plugin.request.args['siteid'][0])
-    api = BaseForum.__subclasses__()[int(siteid)]()
+@plugin.route('/sites/<siteid>-<cls>/episodes/e<epid>/<partnum>')
+def play_video(siteid, cls, epid, partnum):
+    siteid = int(siteid)
+    api = BaseForum.__subclasses__()[siteid]()
 
     part_media = plugin.request.args['media'][0]
     media = []
