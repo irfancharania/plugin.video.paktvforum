@@ -110,8 +110,11 @@ def remove_bookmark(item_path):
 
 
 def __add_listitem(items, groupname=''):
-    bookmarks = plugin.get_storage(bookmark_storage)
-
+    '''
+    Redirect all entries through here
+    to add bookmark option in context menu and
+    to add item info to temp storage
+    '''
     def context_menu(item_path, groupname):
         context_menu = [(
             'Add Bookmark',
