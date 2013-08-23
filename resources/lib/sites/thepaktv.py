@@ -251,6 +251,6 @@ class ThePakTvApi(BaseForum):
             'label': HTMLParser.HTMLParser().unescape(part.text),
             'partnum': num,
             'media': part.media
-        } for num, part in p.parts.items()]
+        } for num, part in sorted(p.parts.items())]
 
         return items
