@@ -9,6 +9,7 @@ import resources.lib.structure as s
 bookmark_storage = 'my_bookmarks'
 temp_storage = 'temp_storage'
 
+
 plugin = Plugin()
 
 
@@ -344,12 +345,117 @@ def get_episode_data(siteid, cls, epid):
                 media=item['media']),
             'is_playable': True
             } for item in data]
-        return plugin.finish(items, sort_methods=['title'])
+
+        # Add continuous play to top
+        # if Single Link (Part 0) does not exist
+        # and more than 1 parts
+        if (data[0]['partnum'] != '0' and
+                len(data) > 1):
+
+            # save post data to temp
+            temp = plugin.get_storage(temp_storage)
+            temp.clear()
+            temp['items'] = data
+
+            items.insert(0, {
+                'label': 'Continuous Play',
+                'path': plugin.url_for(
+                    'play_video_continuous', siteid=siteid, cls=cls,
+                    epid=epid),
+                'is_playable': True
+            })
+
+        return items
+
     else:
         msg = '[B][COLOR red]No valid links found.[/COLOR][/B]'
         plugin.log.error(msg)
         dialog = xbmcgui.Dialog()
         dialog.ok(api.long_name, msg)
+
+
+def __resolve_item(item):
+    import urlresolver
+    media = urlresolver.HostedMediaFile(
+        host=item[0].server, media_id=item[1])
+    return media.resolve()
+
+
+def __resolve_part(medialist, selected_host):
+    ''' resolve stream url for part
+    based on selected host or next best case
+    '''
+
+    stream_url = None
+    # try to resolve selected host
+    for item in medialist:
+        if (item[0].server == selected_host):
+            stream_url = __resolve_item(item)
+
+            # remove from list (to avoid repeated resolving)
+            medialist.remove(item)
+            break
+
+    # if fail, get the next best thing
+    if not stream_url:
+        while medialist:
+            stream_url = __resolve_item(medialist.pop())
+            if stream_url:
+                break
+
+    return stream_url
+
+
+@plugin.route('/sites/<siteid>-<cls>/episodes/e<epid>/all')
+def play_video_continuous(siteid, cls, epid):
+    siteid = int(siteid)
+    api = BaseForum.__subclasses__()[siteid]()
+
+    temp = plugin.get_storage(temp_storage)
+    data = temp['items']
+
+    part_media = data[0]['media']
+
+    media = []
+
+    import urlresolver
+    for host, vid in sorted(part_media, key=lambda x: x[0].server):
+        r = urlresolver.HostedMediaFile(
+            host=host.server, media_id=vid)
+        if r:
+            media.append(r)
+
+    source = urlresolver.choose_source(media)
+    print '>>> Source selected'
+    print source
+
+    if source:
+        selected_host = source.get_host()
+        plugin.log.debug('play from host {host}'.format(host=selected_host))
+
+        items = []
+
+        for part in data:
+            medialist = part['media']
+            stream_url = __resolve_part(medialist, selected_host)
+
+            items.append({
+                'label': part['label'],
+                'path': stream_url
+            })
+
+        xbmc.PlayList(xbmc.PLAYLIST_VIDEO).clear()
+        plugin.add_to_playlist(items)
+
+        # Setting resolved url for first item
+        # otherwise playlist seems to skip it
+        plugin.set_resolved_url(items[0])
+
+    else:
+        msg = ['Unable to play video', 'Please choose another source']
+        plugin.log.error(msg[0])
+        dialog = xbmcgui.Dialog()
+        dialog.ok(api.long_name, *msg)
 
 
 @plugin.route('/sites/<siteid>-<cls>/episodes/e<epid>/<partnum>')
