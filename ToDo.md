@@ -1,3 +1,1 @@
-- globalize strings
-- Add Continuous Play
 - look at doing live channels

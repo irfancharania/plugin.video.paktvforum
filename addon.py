@@ -9,14 +9,44 @@ import resources.lib.structure as s
 bookmark_storage = 'my_bookmarks'
 temp_storage = 'temp_storage'
 
-
 plugin = Plugin()
+
+
+STRINGS = {
+    'url_resolver_settings': 30100,
+    'try_again': 30020,
+    'site_unavailable': 30021,
+    'is_unavailable': 30022,
+    'try_again_later': 30023,
+    'no_episodes': 30026,
+    'no_valid_links': 30027,
+    'cannot_play': 30028,
+    'choose_source': 30029,
+    'bookmarks': 30110,
+    'add_bookmark': 30111,
+    'remove_bookmark': 30112,
+    'no_bookmarks': 30113,
+    'bookmark_success': 30114,
+    'bookmark_storage_fail': 30115,
+    'bookmark_error': 30116,
+    'bookmark_remove_question': 30117,
+}
+
+def _(string_id):
+    if string_id in STRINGS:
+        return plugin.get_string(STRINGS[string_id])
+    else:
+        plugin.log.warning('String is missing: %s' % string_id)
+        return string_id
+
+
+###############################################
 
 
 @plugin.route('/')
 def index():
     items = [{
-        'label': '[B]Bookmarks[/B]',
+        'label': '[B]{txt}[/B]'.format(txt=_('bookmarks')),
         'path': plugin.url_for('show_bookmarks'),
         'thumbnail': util.get_image_path('bookmark.png')}]
 
@@ -31,7 +61,8 @@ def index():
 
     thumb = util.get_image_path('settings.png')
     items.append({
-        'label': '[COLOR white]Url Resolver Settings[/COLOR]',
+        'label': '[COLOR white]{txt}[/COLOR]'.format(
+            txt=_('url_resolver_settings')),
         'path': plugin.url_for('get_urlresolver_settings'),
         'thumbnail': thumb,
         'icon': thumb
@@ -46,7 +77,7 @@ def index():
 def show_bookmarks():
     def context_menu(item_path):
         context_menu = [(
-            'Remove Bookmark',
+            _('remove_bookmark'),
             'XBMC.RunPlugin(%s)' % plugin.url_for('remove_bookmark',
                                                   item_path=item_path,
                                                   refresh=True),
@@ -60,7 +91,7 @@ def show_bookmarks():
         item['context_menu'] = context_menu(item['path'])
     if not items:
         items = [{
-            'label': '- No Bookmarks -',
+            'label': _('no_bookmarks'),
             'path': plugin.url_for('show_bookmarks'),
         }]
 
@@ -71,22 +102,28 @@ def show_bookmarks():
 def add_bookmark(item_path):
     bookmarks = plugin.get_storage(bookmark_storage)
 
-    if not item_path in bookmarks:
-        temp = plugin.get_storage(temp_storage)
-        item = temp[item_path]
+    if bookmarks is not None:
+        if not item_path in bookmarks:
+            temp = plugin.get_storage(temp_storage)
+            item = temp[item_path]
 
-        groupname = plugin.request.args['groupname'][0]
-        if groupname:
-            item['label'] = groupname + ' - ' + item['label']
+            groupname = plugin.request.args['groupname'][0]
+            if groupname:
+                item['label'] = groupname + ' - ' + item['label']
 
-        bookmarks[item_path] = item
+            bookmarks[item_path] = item
+        else:
+            item = bookmarks[item_path]
+
+        dialog = xbmcgui.Dialog()
+        dialog.ok(_('add_bookmark'),
+                  _('bookmark_success'),
+                  '{label}'.format(label=item['label']))
     else:
-        item = bookmarks[item_path]
-
-    dialog = xbmcgui.Dialog()
-    dialog.ok('Add Bookmark',
-              'Successfully bookmarked: ',
-              '{label}'.format(label=item['label']))
+        msg = [_('bookmark_storage_fail'), _('try_again')]
+        plugin.log.error(msg[0])
+        dialog = xbmcgui.Dialog()
+        dialog.ok(_('bookmark_error'), *msg)
 
 
 @plugin.route('/bookmarks/remove/<item_path>')
@@ -95,8 +132,8 @@ def remove_bookmark(item_path):
     label = bookmarks[item_path]['label']
 
     dialog = xbmcgui.Dialog()
-    if dialog.yesno('Remove Bookmark',
-                    'Are you sure you wish to remove bookmark:',
+    if dialog.yesno(_('remove_bookmark'),
+                    _('bookmark_remove_question'),
                     '{label}'.format(label=label)):
 
         plugin.log.debug('remove bookmark: {label}'.format(label=label))
@@ -118,7 +155,7 @@ def __add_listitem(items, groupname=''):
     '''
     def context_menu(item_path, groupname):
         context_menu = [(
-            'Add Bookmark',
+            _('add_bookmark'),
             'XBMC.RunPlugin(%s)' % plugin.url_for(
                 endpoint='add_bookmark',
                 item_path=item_path,
@@ -196,10 +233,11 @@ def get_category_menu(siteid, cls):
 
         else:
             msg = [
-                '[B][COLOR red]Website is unavailable.[/COLOR][/B]',
-                '{site} is unavailable at this time'.format(
-                    site=api.long_name),
-                'Please try again later.']
+                '[B][COLOR red]{txt}[/COLOR][/B]'.format(
+                    txt=_('site_unavailable')),
+                '{site} {txt}'.format(
+                    site=api.long_name, txt=_('is_unavailable')),
+                _('try_again_later')]
             plugin.log.error(msg[1])
 
             dialog = xbmcgui.Dialog()
@@ -321,7 +359,8 @@ def browse_shows(siteid, cls, showid, showpage=1):
 
         return __add_listitem(groupname=api.short_name, items=items)
     else:
-        msg = '[B][COLOR red]No episodes found.[/COLOR][/B]'
+        msg = '[B][COLOR red]{txt}[/COLOR][/B]'.format(
+            txt=_('no_episodes'))
         plugin.log.error(msg)
         dialog = xbmcgui.Dialog()
         dialog.ok(api.long_name, msg)
@@ -368,7 +407,8 @@ def get_episode_data(siteid, cls, epid):
         return items
 
     else:
-        msg = '[B][COLOR red]No valid links found.[/COLOR][/B]'
+        msg = '[B][COLOR red]{txt}[/COLOR][/B]'.format(
+            txt=_('no_valid_links'))
         plugin.log.error(msg)
         dialog = xbmcgui.Dialog()
         dialog.ok(api.long_name, msg)
@@ -378,7 +418,7 @@ def __resolve_item(item):
     import urlresolver
     media = urlresolver.HostedMediaFile(
         host=item[0].server, media_id=item[1])
-    return media.resolve()
+    return media.resolve(), item[0].thumb
 
 
 def __resolve_part(medialist, selected_host):
@@ -386,11 +426,11 @@ def __resolve_part(medialist, selected_host):
     based on selected host or next best case
     '''
 
-    stream_url = None
+    stream_url, thumb = None, None
     # try to resolve selected host
     for item in medialist:
         if (item[0].server == selected_host):
-            stream_url = __resolve_item(item)
+            stream_url, thumb = __resolve_item(item)
 
             # remove from list (to avoid repeated resolving)
             medialist.remove(item)
@@ -399,11 +439,11 @@ def __resolve_part(medialist, selected_host):
     # if fail, get the next best thing
     if not stream_url:
         while medialist:
-            stream_url = __resolve_item(medialist.pop())
+            stream_url, thumb = __resolve_item(medialist.pop())
             if stream_url:
                 break
 
-    return stream_url
+    return stream_url, thumb
 
 
 @plugin.route('/sites/<siteid>-<cls>/episodes/e<epid>/all')
@@ -437,11 +477,13 @@ def play_video_continuous(siteid, cls, epid):
 
         for part in data:
             medialist = part['media']
-            stream_url = __resolve_part(medialist, selected_host)
+            stream_url, thumb = __resolve_part(medialist, selected_host)
 
             items.append({
-                'label': part['label'],
-                'path': stream_url
+                'label': 'Continuous Play: {part}'.format(part=part['label']),
+                'path': stream_url,
+                'thumbnail': thumb,
+                'icon': thumb,
             })
 
         xbmc.PlayList(xbmc.PLAYLIST_VIDEO).clear()
@@ -452,7 +494,7 @@ def play_video_continuous(siteid, cls, epid):
         plugin.set_resolved_url(items[0])
 
     else:
-        msg = ['Unable to play video', 'Please choose another source']
+        msg = [_('cannot_play'), _('choose_source')]
         plugin.log.error(msg[0])
         dialog = xbmcgui.Dialog()
         dialog.ok(api.long_name, *msg)
@@ -484,15 +526,17 @@ def play_video(siteid, cls, epid, partnum):
         plugin.set_resolved_url(url)
 
     else:
-        msg = ['Unable to play video', 'Please choose another source']
+        msg = [_('cannot_play'), _('choose_source')]
         plugin.log.error(msg[0])
         dialog = xbmcgui.Dialog()
         dialog.ok(api.long_name, *msg)
 
 
 if __name__ == '__main__':
-    try:
-        plugin.run()
-    except Exception, e:
-        plugin.log.error(e)
-        plugin.notify(msg=e)
+    plugin.run()
+#    try:
+#        plugin.run()
+#    except Exception, e:
+#        plugin.log.error(e)
+#        plugin.notify(msg=e)
+#
