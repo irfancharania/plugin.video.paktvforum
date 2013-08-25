@@ -32,6 +32,7 @@ STRINGS = {
     'bookmark_remove_question': 30117,
 }
 
+
 def _(string_id):
     if string_id in STRINGS:
         return plugin.get_string(STRINGS[string_id])
@@ -388,7 +389,7 @@ def get_episode_data(siteid, cls, epid):
         # Add continuous play to top
         # if Single Link (Part 0) does not exist
         # and more than 1 parts
-        if (data[0]['partnum'] != '0' and
+        if (data[0]['partnum'] != 0 and
                 len(data) > 1):
 
             # save post data to temp
@@ -466,8 +467,8 @@ def play_video_continuous(siteid, cls, epid):
             media.append(r)
 
     source = urlresolver.choose_source(media)
-    print '>>> Source selected'
-    print source
+    plugin.log.debug('>>> Source selected')
+    plugin.log.debug(source)
 
     if source:
         selected_host = source.get_host()
@@ -516,8 +517,8 @@ def play_video(siteid, cls, epid, partnum):
             media.append(r)
 
     source = urlresolver.choose_source(media)
-    print '>>> Source selected'
-    print source
+    plugin.log.debug('>>> Source selected')
+    plugin.log.debug(source)
 
     if source:
         url = source.resolve()
@@ -534,9 +535,10 @@ def play_video(siteid, cls, epid, partnum):
 
 if __name__ == '__main__':
     plugin.run()
-#    try:
-#        plugin.run()
-#    except Exception, e:
-#        plugin.log.error(e)
-#        plugin.notify(msg=e)
-#
+    '''
+    try:
+        plugin.run()
+    except Exception, e:
+        plugin.log.error(e)
+        plugin.notify(msg=e)
+    '''

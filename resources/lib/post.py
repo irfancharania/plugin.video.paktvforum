@@ -86,12 +86,12 @@ class Post():
         '''
         # parse text to get part number
         partnum = self.__get_part_number(urltext)
-        if partnum:
+        if partnum is not None:
 
             # parse posturl to get matchstr
             match = self.__get_match_string(posturl)
             if match:
-                print 'Match string: {match}'.format(match=match)
+                #print 'Match string: {match}'.format(match=match)
 
                 # get host from local match string dictionary
                 host, vidstr = self.__matchstr.get(match) or (None, None)
@@ -127,5 +127,6 @@ class Post():
         else:
             print self.__warningmsg.format(
                 addon=util.addon_id, item='partnum',
-                text=urltext + ' - ' +  posturl)
-
+                text=urltext.encode(
+                    'utf-8', 'ignore') + ' - ' + posturl.encode(
+                    'utf-8', 'ignore'))

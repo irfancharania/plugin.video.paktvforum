@@ -4,8 +4,6 @@ import resources.lib.util as util
 import HTMLParser
 import resources.lib.structure as s
 import resources.lib.hosts as hosts
-from resources.lib.post import Post
-from xbmcswift2 import xbmcgui
 
 
 class DesiRulezApi(BaseForum):
@@ -16,7 +14,7 @@ class DesiRulezApi(BaseForum):
     sub_id_regex = '(?:\?f=|\/f|\?t=)(\d+)'
 
     section_url_template = 'forumdisplay.php?f='
-    mobile_styleid = '129'
+    mobile_style = '&styleid=129'
 
 ###############################################
     category_drama = s.Category('Browse Pakistani Dramas', [
@@ -61,24 +59,14 @@ class DesiRulezApi(BaseForum):
 
 ###############################################
 
-    def get_category_menu(self):
-        items = [{
-            'label': value.label,
-            'categoryid': key
-            } for key, value in self.categories.items()]
-        return items
-
-    def get_channel_menu(self, categoryid):
-        return self.categories[categoryid].channels
-
     def get_show_menu(self, channelid):
         ''' Get shows for specified channel'''
 
-        url = '{base}{section}{pk}&styleid={styleid}'.format(
+        url = '{base}{section}{pk}{style}'.format(
             base=self.base_url,
             section=self.section_url_template,
             pk=channelid,
-            styleid=self.mobile_styleid)
+            style=self.mobile_style)
 
         print 'Get show menu: {url}'.format(url=url)
 
@@ -126,86 +114,3 @@ class DesiRulezApi(BaseForum):
             })
 
         return channels, shows
-
-    def get_episode_menu(self, url, page=1):
-        ''' Get episodes for specified show '''
-
-        url = '{url}&styleid={styleid}'.format(
-            url=url, styleid=self.mobile_styleid)
-        data = util.get_remote_data(url)
-        soup = BeautifulSoup(data, convertEntities=BeautifulSoup.HTML_ENTITIES)
-
-        items = []
-        next_url = None
-
-        container = soup.find('ul', id='threads')
-        if container and len(container) > 0:
-            linklist = container.findAll('h3')
-
-            for l in linklist:
-                tagline = HTMLParser.HTMLParser().unescape(l.a.text)
-                link = l.a['href']
-
-                tid = self.get_sub_id(link)
-
-                items.append({
-                    'label': tagline,
-                    'url': self.base_url + link,
-                    'pk': tid,
-                })
-
-            navlink = soup.find('div', attrs={'data-role': 'vbpagenav'})
-
-            if navlink:
-                total_pages = int(navlink['data-totalpages'])
-                if (total_pages and total_pages > page):
-                    pg = url.find('&page=')
-                    url = url[:pg] if pg > 0 else url
-                    next_url = url + '&page=' + str(page + 1)
-
-        return items, next_url
-
-    def get_episode_data(self, url):
-        url = '{url}&styleid={styleid}'.format(
-            url=url, styleid=self.mobile_styleid)
-        print 'Get episode data: {url}'.format(url=url)
-
-        data = util.get_remote_data(url)
-        soup = BeautifulSoup(data, convertEntities=BeautifulSoup.HTML_ENTITIES)
-
-        linklist = soup.find('ol', id='posts').find(
-            'blockquote', 'postcontent restore').findAll('a')
-
-        # correct links for erroneous formatting
-        cleanlinks = util.clean_post_links(linklist)
-
-        # parse post links
-        p = Post(self.match_string)
-
-        progress = xbmcgui.DialogProgress()
-        progress.create('[B]Processing found links[/B]')
-        total = len(cleanlinks)
-        current = 0
-
-        for url, text in cleanlinks.items():
-            current += 1
-            percent = (current * 100) // total
-            msg = 'Processing {current} of {total}'.format(
-                current=current, total=total)
-            progress.update(percent, '', msg, '')
-
-            if progress.iscanceled():
-                break
-
-            # process here
-            p.add_link(url, text)
-
-        progress.close()
-
-        items = [{
-            'label': HTMLParser.HTMLParser().unescape(part.text),
-            'partnum': num,
-            'media': part.media
-        } for num, part in sorted(p.parts.items())]
-
-        return items
