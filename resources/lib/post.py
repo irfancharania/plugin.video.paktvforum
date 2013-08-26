@@ -23,8 +23,9 @@ class Part():
 
 class Post():
     __warningmsg = '{addon}: **WARNING** No {item} found for {text}'
-    regex_find_promo = re.compile('\([pP]romo\)')
+    regex_find_promo = re.compile('\(?[pP](?:romo|review)\)?')
     regex_find_parts = re.compile('[pP]art\s*(\d+)')
+    regex_match_string = re.compile('\/(\w+\.php)\?')
 
     def __init__(self, matchstr):
         self.parts = {}
@@ -60,7 +61,7 @@ class Post():
         get match string for host mapping
         e.g. tube.php -> youtube
         '''
-        m = re.compile('\/(\w+\.php)\?').findall(text)
+        m = self.regex_match_string.findall(text)
         if m:
             match = m[0]
         return match
@@ -71,7 +72,7 @@ class Post():
         Single link is Part 0
         Ignore 'promo' links
         '''
-        if self.regex_find_promo.findall('Promo'):
+        if self.regex_find_promo.findall(text):
             return None
         else:
             p = self.regex_find_parts.findall(text)
