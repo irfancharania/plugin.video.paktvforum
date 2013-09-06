@@ -4,16 +4,19 @@ from resources.lib.sites import *
 import resources.lib.util as util
 from operator import itemgetter
 import resources.lib.structure as s
+import resources.lib.sites.live as live
 
 
 bookmark_storage = 'my_bookmarks'
 temp_storage = 'temp_storage'
+livestream_xml_url = 'livestream_xml_url'
 
 plugin = Plugin()
 
 
 STRINGS = {
     'url_resolver_settings': 30100,
+    'live_streams': 30016,
     'try_again': 30020,
     'site_unavailable': 30021,
     'is_unavailable': 30022,
@@ -59,6 +62,18 @@ def index():
         'thumbnail': util.get_image_path(sc.local_thumb),
         'icon': util.get_image_path(sc.local_thumb),
         } for index, sc in enumerate(BaseForum.__subclasses__())])
+
+    # live streams if xml url specified
+    url = plugin.get_setting(livestream_xml_url, str)
+    if url:
+        thumb = util.get_image_path('thumb_live.jpg')
+        items.append({
+            'label': '[B]{txt}[/B]'.format(
+                txt=_('live_streams')),
+            'path': plugin.url_for('get_live_channels'),
+            'thumbnail': thumb,
+            'icon': thumb
+        })
 
     thumb = util.get_image_path('settings.png')
     items.append({
@@ -531,6 +546,47 @@ def play_video(siteid, cls, epid, partnum):
         plugin.log.error(msg[0])
         dialog = xbmcgui.Dialog()
         dialog.ok(api.long_name, *msg)
+
+
+###############################################
+
+
+@plugin.route('/live/')
+def get_live_channels():
+    plugin.log.debug('browse live channels')
+
+    api = live.LiveStreamApi()
+    url = plugin.get_setting(livestream_xml_url, str)
+
+    channels = get_cached(api.get_xml_data, url)
+
+    items = [{
+        'label': item['label'],
+        'thumbnail': item['thumb'],
+        'icon': item['thumb'],
+        'path': plugin.url_for(
+            'play_stream', url=item['url'],
+            regex=item['regex']
+        ),
+        'is_playable': True
+    } for item in channels]
+
+    return __add_listitem(groupname=api.short_name,
+                          items=items)
+
+
+@plugin.route('/live/<url>')
+def play_stream(url):
+    regex = plugin.request.args.get('regex', [s.LiveStreamRegex()])[0]
+    if regex.label:
+        api = live.LiveStreamApi()
+        url = get_cached(api.get_parsed_url, url, regex)
+
+    plugin.log.debug('play live stream: {url}'.format(url=url))
+    plugin.set_resolved_url(url)
+
+
+###############################################
 
 
 if __name__ == '__main__':

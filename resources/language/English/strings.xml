@@ -3,10 +3,14 @@
   <!-- Plugin Name -->
   <string id="30000">PakTVForum</string>
 
+  <!-- Settings -->
+  <string id="30001">Live Stream XML Url</string>
+
   <!-- Sites -->
   <string id="30010">The Pak TV Forum</string>
   <string id="30011">Desi Ronak Forum</string>
   <string id="30012">Desi Rulez Forum</string>
+  <string id="30016">Live Streams</string>
 
   <!-- General -->
   <string id="30020">Please try again</string>

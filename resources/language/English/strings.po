@@ -15,6 +15,10 @@ msgctxt "#30000"
 msgid "PakTVForum"
 msgstr ""
 
+msgctxt "#30001"
+msgid "Live Stream XML Url"
+msgstr ""
+
 #########################
 
 msgctxt "#30010"
@@ -27,6 +31,10 @@ msgstr ""
 
 msgctxt "#30012"
 msgid "Desi Rulez Forum"
+msgstr ""
+
+msgctxt "#30016"
+msgid "Live Streams"
 msgstr ""
 
 #########################

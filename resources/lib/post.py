@@ -62,6 +62,7 @@ class Post():
         e.g. tube.php -> youtube
         '''
         m = self.regex_match_string.findall(text)
+        match = None
         if m:
             match = m[0]
         return match

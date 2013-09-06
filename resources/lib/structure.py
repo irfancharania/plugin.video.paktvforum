@@ -1,8 +1,11 @@
 import resources.lib.util as util
+import HTMLParser
 
 
 class ThreadType():
-    ''' Enum representing types a forum can contain'''
+    '''
+    Enum representing types a forum can contain
+    '''
     Show, Episode = range(2)
 
 
@@ -23,3 +26,29 @@ class Channel():
         if self.__thumb:
             self.__thumb = util.get_image_path(self.__thumb)
         return self.__thumb
+
+
+class LiveStreamRegex():
+    '''
+    Represents the regex portion supplied for a Live Stream
+    (optional)
+    '''
+    def __init__(self, label='', expres='', page='', refer='', agent=''):
+        self.label = HTMLParser.HTMLParser().unescape(label)
+        self.expres = expres
+        self.page = HTMLParser.HTMLParser().unescape(page)
+        self.refer = HTMLParser.HTMLParser().unescape(refer)
+        self.agent = agent
+
+    def __str__(self):
+        return '''
+                label: {label},
+                express: {expres},
+                page: {page},
+                refer: {refer},
+                agent: {agent}'''.format(
+            label=self.label,
+            expres=self.expres,
+            page=self.page,
+            refer=self.refer,
+            agent=self.agent)

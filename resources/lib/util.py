@@ -16,11 +16,14 @@ def get_image_path(image):
     return image
 
 
-def get_remote_data(url, ismobile=True):
+def get_remote_data(url, ismobile=True, referer=None):
     ''' fetch website data as mobile or desktop browser'''
     user_agent = user_agent_mobile if ismobile else user_agent_desktop
 
     headers = {'User-Agent': user_agent}
+    if referer:
+        headers['Referer'] = referer
+
     r = requests.get(url, headers=headers)
     return r.content
 
