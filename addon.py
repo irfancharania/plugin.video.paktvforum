@@ -21,6 +21,7 @@ STRINGS = {
     'site_unavailable': 30021,
     'is_unavailable': 30022,
     'try_again_later': 30023,
+    'channel_xml_fail': 30024,
     'no_episodes': 30026,
     'no_valid_links': 30027,
     'cannot_play': 30028,
@@ -560,19 +561,27 @@ def get_live_channels():
 
     channels = get_cached(api.get_xml_data, url)
 
-    items = [{
-        'label': item['label'],
-        'thumbnail': item['thumb'],
-        'icon': item['thumb'],
-        'path': plugin.url_for(
-            'play_stream', url=item['url'],
-            regex=item['regex']
-        ),
-        'is_playable': True
-    } for item in channels]
+    if channels:
+        items = [{
+            'label': item['label'],
+            'thumbnail': item['thumb'],
+            'icon': item['thumb'],
+            'path': plugin.url_for(
+                'play_stream', url=item['url'],
+                regex=item['regex']
+            ),
+            'is_playable': True
+        } for item in channels]
 
-    return __add_listitem(groupname=api.short_name,
-                          items=items)
+        return __add_listitem(groupname=api.short_name,
+                              items=items)
+    else:
+        msg = '[B][COLOR red]{txt}[/COLOR][/B]'.format(
+                txt=_('channel_xml_fail'))
+        plugin.log.error(msg)
+
+        dialog = xbmcgui.Dialog()
+        dialog.ok(_('live_streams'), msg)
 
 
 @plugin.route('/live/<url>')
@@ -590,11 +599,8 @@ def play_stream(url):
 
 
 if __name__ == '__main__':
-    plugin.run()
-    '''
     try:
         plugin.run()
     except Exception, e:
         plugin.log.error(e)
         plugin.notify(msg=e)
-    '''

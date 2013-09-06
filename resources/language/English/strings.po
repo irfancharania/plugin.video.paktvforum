@@ -44,7 +44,7 @@ msgid "Please try again"
 msgstr ""
 
 msgctxt "#30021"
-msgid "Website is unavailable."
+msgid "Website is unavailable"
 msgstr ""
 
 msgctxt "#30022"
@@ -53,6 +53,10 @@ msgstr ""
 
 msgctxt "#30023"
 msgid "Please try again at a later time"
+msgstr ""
+
+msgctxt "#30024"
+msgid "Unable to load channels from xml"
 msgstr ""
 
 msgctxt "#30026"

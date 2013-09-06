@@ -14,9 +14,10 @@
 
   <!-- General -->
   <string id="30020">Please try again</string>
-  <string id="30021">Website is unavailable.</string>
+  <string id="30021">Website is unavailable</string>
   <string id="30022">is unavailable at this time</string>
   <string id="30023">Please try again at a later time</string>
+  <string id="30024">Unable to load channels from xml</string>
   <string id="30026">No episodes found.</string>
   <string id="30027">No valid links found.</string>
   <string id="30028">Unable to play video</string>
