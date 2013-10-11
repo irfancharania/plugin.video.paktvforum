@@ -4,6 +4,7 @@ import resources.lib.util as util
 import HTMLParser
 import resources.lib.structure as s
 import resources.lib.hosts as hosts
+import datetime
 
 
 class ThePakTvApi(BaseForum):
@@ -62,7 +63,10 @@ class ThePakTvApi(BaseForum):
 ###############################################
     frames = [
         {'label': 'Today\'s Top Dramas',
-         'url': 'http://www.paktvnetwork.com/Ads/forum/update3/Today/6.html',
+         'url':
+            (
+                'http://www.paktvnetwork.com/Ads/forum/update3/Today/{day}.html'
+            ).format(day=datetime.datetime.now().weekday() + 1),
          'containstype': s.ThreadType().Show},
         {'label': 'Today\'s Talk Shows',
          'url': 'http://www.paktvnetwork.com/Ads/forum/update3/Shows/5.html',

@@ -112,7 +112,7 @@ def show_bookmarks():
             'path': plugin.url_for('show_bookmarks'),
         }]
 
-    return plugin.finish(items, sort_methods=['title'])
+    return sorted(items, key=lambda x: x['label'].partition('-')[2])
 
 
 @plugin.route('/bookmarks/add/<item_path>')
