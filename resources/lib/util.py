@@ -1,4 +1,5 @@
 import requests
+import json
 
 
 # allows us to get mobile version
@@ -58,5 +59,34 @@ def clean_post_links(linklist):
                 tag_dic[key] = value
             else:
                 tag_dic[key] = tag_dic[key] + ' ' + value
+
+    return tag_dic
+
+def find_host_link(tag_dic):
+    '''
+    Some post links lead to pages where id is different from host video id
+    post link: http://faltulinks.net/media/video.php?id=123
+    vid link: http://tune.pk/player/embed_player.php?vid=456
+
+    input: key/value -> link/title
+    '''
+
+    # using Yahoo Pipes to do parsing cuz
+    # it provides built-in caching and formatting
+    parser_url = 'http://pipes.yahoo.com/pipes/pipe.run?_id=411841d418a3c257695b95fa2bc98121&_render=json'
+
+    for key in tag_dic:
+        if (key.find('video.php')):
+            # fetch page
+            r = requests.get(parser_url, params={'urlinput': key})
+
+            # get actual link
+            jd = json.loads(r.content)
+
+            if jd['count'] > 0:
+                vid_link = jd['value']['items'][0]['src']
+
+                # replace list item
+                tag_dic[vid_link] = tag_dic.pop(key)
 
     return tag_dic

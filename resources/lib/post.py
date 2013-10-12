@@ -25,7 +25,7 @@ class Post():
     __warningmsg = '{addon}: **WARNING** No {item} found for {text}'
     regex_find_promo = re.compile('\(?[pP](?:romo|review)\)?')
     regex_find_parts = re.compile('[pP]art\s*(\d+)')
-    regex_match_string = re.compile('\/(\w+\.php)\?')
+    regex_match_string = re.compile('(\w+\.\w+)(?:\/(?:embed|player)|\?)')
 
     def __init__(self, matchstr):
         self.parts = {}

@@ -4,6 +4,8 @@ import resources.lib.util as util
 import HTMLParser
 import resources.lib.structure as s
 import resources.lib.hosts as hosts
+from resources.lib.post import Post
+from xbmcswift2 import xbmcgui
 
 
 class DesiRulezApi(BaseForum):
@@ -55,6 +57,10 @@ class DesiRulezApi(BaseForum):
         'put.php': (hosts.putlocker, 'id='),
         'weed.php': (hosts.videoweed, 'id='),
         'novamov.php': (hosts.novamov, 'id='),
+        'dailymotion.com': (hosts.dailymotion, 'video/'),
+        'tune.pk': (hosts.tunepk, 'vid='),
+        'hostingbulk.com': (hosts.hostingbulk, 'embed-'),
+        'youtube.com': (hosts.youtube, 'embed/'),
     }
 
 ###############################################
@@ -114,3 +120,49 @@ class DesiRulezApi(BaseForum):
             })
 
         return channels, shows
+
+    def get_episode_data(self, url):
+        url = '{url}{style}'.format(
+            url=url, style=self.mobile_style)
+        print 'Get episode data: {url}'.format(url=url)
+
+        data = util.get_remote_data(url)
+        soup = BeautifulSoup(data, convertEntities=BeautifulSoup.HTML_ENTITIES)
+
+        linklist = soup.find('ol', id='posts').find(
+            'blockquote', 'postcontent restore').findAll('a')
+
+        # correct links for erroneous formatting
+        # and fetch correct link for misleading ids
+        cleanlinks = util.find_host_link(util.clean_post_links(linklist))
+
+        # parse post links
+        p = Post(self.match_string)
+
+        progress = xbmcgui.DialogProgress()
+        progress.create('[B]Processing found links[/B]')
+        total = len(cleanlinks)
+        current = 0
+
+        for url, text in cleanlinks.items():
+            current += 1
+            percent = (current * 100) // total
+            msg = 'Processing {current} of {total}'.format(
+                current=current, total=total)
+            progress.update(percent, '', msg, '')
+
+            if progress.iscanceled():
+                break
+
+            # process here
+            p.add_link(url, text)
+
+        progress.close()
+
+        items = [{
+            'label': HTMLParser.HTMLParser().unescape(part.text),
+            'partnum': num,
+            'media': part.media
+        } for num, part in sorted(p.parts.items())]
+
+        return items
