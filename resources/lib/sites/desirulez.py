@@ -40,23 +40,31 @@ class DesiRulezApi(BaseForum):
         s.Channel('1043', 'Samaa News', 'samaa.png'),
     ])
 
+    category_misc = s.Category('Miscellaneous', [
+        s.Channel('339', 'MTV', 'mtv.jpg'),
+    ])
+
     categories = {
         'drama': category_drama,
         'news': category_news,
+        'misc': category_misc,
     }
 
 ###############################################
 
     match_string = {
         'yt.php': (hosts.youtube, 'v='),
+        'youtube.php': (hosts.youtube, 'id='),
         'yw.php': (hosts.youtube, 'id='),
         'dm.php': (hosts.dailymotion, 'v='),
         'tune.php': (hosts.tunepk, 'v='),
         'hb.php': (hosts.hostingbulk, 'v='),
         'nowvideo.php': (hosts.nowvideo, 'v='),
+        'now.php': (hosts.nowvideo, 'id='),
         'put.php': (hosts.putlocker, 'id='),
         'weed.php': (hosts.videoweed, 'id='),
         'novamov.php': (hosts.novamov, 'id='),
+        'movshare.php': (hosts.movshare, 'id='),
         'dailymotion.com': (hosts.dailymotion, 'video/'),
         'tune.pk': (hosts.tunepk, 'vid='),
         'hostingbulk.com': (hosts.hostingbulk, 'embed-'),

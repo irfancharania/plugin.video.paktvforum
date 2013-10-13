@@ -62,6 +62,7 @@ def clean_post_links(linklist):
 
     return tag_dic
 
+
 def find_host_link(tag_dic):
     '''
     Some post links lead to pages where id is different from host video id
