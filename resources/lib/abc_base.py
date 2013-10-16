@@ -95,12 +95,13 @@ class BaseForum(object):
 
         if linklist and len(linklist) > 0:
             for l in linklist:
-                tagline = HTMLParser.HTMLParser().unescape(l.a.text)
-                link = self.base_url + l.a['href']
+                tagline = HTMLParser.HTMLParser().unescape(
+                    l.a.text.encode('utf-8', 'ignore'))
+                link = self.base_url + l.a['href'].encode('utf-8', 'ignore')
                 fid = self.get_sub_id(link)
 
                 data = {
-                    'label': tagline.encode('utf-8', 'ignore'),
+                    'label': tagline,
                     'url': link,
                     'pk': fid,
                 }
@@ -128,13 +129,14 @@ class BaseForum(object):
             linklist = container.findAll('h3')
 
             for l in linklist:
-                tagline = HTMLParser.HTMLParser().unescape(l.a.text)
-                link = l.a['href']
+                tagline = HTMLParser.HTMLParser().unescape(
+                    l.a.text.encode('utf-8', 'ignore'))
+                link = l.a['href'].encode('utf-8', 'ignore')
 
                 tid = self.get_sub_id(link)
 
                 items.append({
-                    'label': tagline.encode('utf-8', 'ignore'),
+                    'label': tagline,
                     'url': self.base_url + link,
                     'pk': tid,
                 })
