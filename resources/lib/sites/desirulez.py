@@ -69,6 +69,7 @@ class DesiRulezApi(BaseForum):
         'tune.pk': (hosts.tunepk, 'vid='),
         'hostingbulk.com': (hosts.hostingbulk, 'embed-'),
         'youtube.com': (hosts.youtube, 'embed/'),
+        'abc.php': (hosts.videotanker, 'id='),
     }
 
 ###############################################
