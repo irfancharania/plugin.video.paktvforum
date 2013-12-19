@@ -23,11 +23,15 @@ class LiveStreamApi(object):
         # not expecting channels
         for item in soup('item'):
             name = HTMLParser.HTMLParser().unescape(item.title.string)
-            url = item.link.string
             thumbnail = item.thumbnail.string
+            url = ''
 
             # helps with sorting
-            is_stream = 1 if '/' in url else 0
+            is_stream = 0
+
+            if (item.link != None and item.link.string != None):
+                url = item.link.string
+                is_stream = 1 if '/' in url else 0
 
             if item.regex:
                 livestream_regex = s.LiveStreamRegex(
