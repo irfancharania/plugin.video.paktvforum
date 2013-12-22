@@ -13,7 +13,7 @@ class DesiRulezApi(BaseForum):
     long_name = 'Desi Rulez Forum'
     local_thumb = 'thumb_desirulez.png'
     base_url = 'http://www.desirulez.net/'
-    sub_id_regex = '(?:\?f=|\/f|\?t=)(\d+)'
+    sub_id_regex = '(?:\?f=|\/f|\?t=|\/)(\d+)'
 
     section_url_template = 'forumdisplay.php?f='
     mobile_style = '&styleid=129'
