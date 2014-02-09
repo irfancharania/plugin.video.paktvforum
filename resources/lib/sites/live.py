@@ -22,43 +22,44 @@ class LiveStreamApi(object):
 
         # not expecting channels
         for item in soup('item'):
-            name = HTMLParser.HTMLParser().unescape(item.title.string)
-            thumbnail = item.thumbnail.string
-            url = ''
+            if (item.title):
+                name = HTMLParser.HTMLParser().unescape(item.title.string)
+                thumbnail = item.thumbnail.string
+                url = ''
 
-            # helps with sorting
-            is_stream = 0
+                # helps with sorting
+                is_stream = 0
 
-            if (item.link != None and item.link.string != None):
-                url = item.link.string
-                is_stream = 1 if '/' in url else 0
+                if (item.link != None and item.link.string != None):
+                    url = item.link.string
+                    is_stream = 1 if '/' in url else 0
 
-            if item.regex:
-                livestream_regex = s.LiveStreamRegex(
-                    # name is a BeautifulSoup keyword
-                    item.regex('name')[0].string,
-                    item.regex.expres.string,
-                    item.regex.page.string)
+                if item.regex:
+                    livestream_regex = s.LiveStreamRegex(
+                        # name is a BeautifulSoup keyword
+                        item.regex('name')[0].string,
+                        item.regex.expres.string,
+                        item.regex.page.string)
 
-                try:
-                    livestream_regex.refer = item.regex.referer.string
-                except:
-                    pass
+                    try:
+                        livestream_regex.refer = item.regex.referer.string
+                    except:
+                        pass
 
-                #try:
-                #    livestream_regex.agent = item.regex.agent
-                #except:
-                #    pass
-            else:
-                livestream_regex = s.LiveStreamRegex()
+                    #try:
+                    #    livestream_regex.agent = item.regex.agent
+                    #except:
+                    #    pass
+                else:
+                    livestream_regex = s.LiveStreamRegex()
 
-            items.append({
-                'label': name,
-                'url': url,
-                'thumb': thumbnail,
-                'regex': livestream_regex,
-                'is_stream': is_stream,
-            })
+                items.append({
+                    'label': name,
+                    'url': url,
+                    'thumb': thumbnail,
+                    'regex': livestream_regex,
+                    'is_stream': is_stream,
+                })
 
         return sorted(items, key=operator.itemgetter('is_stream', 'label'))
 
