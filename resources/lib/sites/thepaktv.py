@@ -11,7 +11,7 @@ class ThePakTvApi(BaseForum):
     short_name = 'thepaktv'
     long_name = 'The PakTV Forum'
     local_thumb = 'thumb_paktv.png'
-    base_url = 'http://www.thepaktv.me/forums/'
+    base_url = 'http://www.geopaktv.com/forums/'
     sub_id_regex = '(?:\?f=|\/f|\?t=)(\d+)'
 
     section_url_template = 'forumdisplay.php?f='
