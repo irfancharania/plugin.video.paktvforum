@@ -11,7 +11,7 @@ class ThePakTvApi(BaseForum):
     short_name = 'thepaktv'
     long_name = 'The PakTV Forum'
     local_thumb = 'thumb_paktv.png'
-    base_url = 'http://www.geopaktv.com/forums/'
+    base_url = 'http://www.thepaktv.net/forums/'
     sub_id_regex = '(?:\?f=|\/f|\?t=)(\d+)'
 
     section_url_template = 'forumdisplay.php?f='
@@ -24,9 +24,11 @@ class ThePakTvApi(BaseForum):
         s.Channel('15', 'PTV Home', 'ptv.png'),
         s.Channel('954', 'Urdu 1', 'urdu1.png'),
         s.Channel('1118', 'Geo Kahani', 'geoKahani.png'),
+        s.Channel('1254', 'Hum Sitaray', 'humsitaray.png'),
         s.Channel('24', 'A Plus', 'aplus.png'),
         s.Channel('19', 'TV One', 'tv1.png'),
         s.Channel('619', 'Express Entertainment', 'expressEntertainment.png'),
+        s.Channel('1318', 'ARY Zindagi', 'aryZindagi.png'),
         s.Channel('25', 'ARY Musik', 'aryMusik.png'),
         s.Channel('23', 'ATV', 'atv.png'),
     ])
