@@ -48,11 +48,6 @@ class BaseForum(object):
 
         return newlist
 
-    # For some reason the fetched request
-    # doesn't contain new icons for posts.
-    # Also, it doesn't tell me that these are newer
-    # from the last time I opened this addon
-    # maybe I need to be logged in for that...
     def has_new_episodes(self, listitem):
         if ((listitem.img['src'].find('new') > 0) or
                 (listitem.a.img)):
@@ -94,11 +89,19 @@ class BaseForum(object):
         shows = []
 
         if linklist and len(linklist) > 0:
+
+            # New items on top
+            linklist = sorted(linklist, key=lambda l: self.has_new_episodes(l), reverse=True)
+
             for l in linklist:
                 tagline = HTMLParser.HTMLParser().unescape(
                     l.a.text.encode('utf-8', 'ignore'))
                 link = self.base_url + l.a['href'].encode('utf-8', 'ignore')
                 fid = self.get_sub_id(link)
+
+                # identify new items
+                if (self.has_new_episodes(l)):
+                    tagline = tagline + '     [B]**NEW**[/B]'
 
                 data = {
                     'label': tagline,

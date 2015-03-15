@@ -120,7 +120,7 @@ def add_bookmark(item_path):
     bookmarks = plugin.get_storage(bookmark_storage)
 
     if bookmarks is not None:
-        if not item_path in bookmarks:
+        if item_path not in bookmarks:
             temp = plugin.get_storage(temp_storage)
             item = temp[item_path]
 

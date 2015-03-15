@@ -63,32 +63,6 @@ class ThePakTvApi(BaseForum):
     }
 
 ###############################################
-    frames = [
-        {'label': 'Today\'s Top Dramas',
-         'url':
-            (
-                'http://www.paktvnetwork.com/Ads/forum/update3/Today/{day}.html'
-            ).format(day=datetime.datetime.now().weekday() + 1),
-         'containstype': s.ThreadType().Show},
-        {'label': 'Today\'s Talk Shows',
-         'url': 'http://www.paktvnetwork.com/Ads/forum/update3/Shows/5.html',
-         'containstype': s.ThreadType().Show},
-        {'label': 'Morning Shows',
-         'url':
-            'http://www.paktvnetwork.com/Ads/forum/update3/MorningShows.html',
-         'containstype': s.ThreadType().Show},
-        {'label': 'Hit Dramas',
-         'url': 'http://www.paktvnetwork.com/Ads/forum/update3/HitDramas.html',
-         'containstype': s.ThreadType().Show},
-        {'label': 'New Arrivals',
-         'url': 'http://www.paktvnetwork.com/Ads/forum/update3/newdramas.html',
-         'containstype': s.ThreadType().Show},
-        {'label': 'Ramdan Kareem Programs',
-         'url':
-            'http://www.paktvnetwork.com/Ads/forum/update3/Today/ramadan.html',
-         'containstype': s.ThreadType().Show}]
-
-###############################################
     match_string = {
         'tube.php': (hosts.youtube, 'v='),
         'daily.php': (hosts.dailymotion, 'v='),
@@ -103,11 +77,7 @@ class ThePakTvApi(BaseForum):
 
 ###############################################
 
-    def get_frame_menu(self):
-        return self.frames
-
     def browse_frame(self, frameid, url):
-        #print '{name} - fetching {url}'.format(name=self.short_name, url=url)
         data = util.get_remote_data(url)
         soup = BeautifulSoup(data, convertEntities=BeautifulSoup.HTML_ENTITIES)
 
