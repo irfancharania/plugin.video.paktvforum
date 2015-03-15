@@ -76,30 +76,3 @@ class ThePakTvApi(BaseForum):
     }
 
 ###############################################
-
-    def browse_frame(self, frameid, url):
-        data = util.get_remote_data(url)
-        soup = BeautifulSoup(data, convertEntities=BeautifulSoup.HTML_ENTITIES)
-
-        frameid = int(frameid)
-        containstype = self.frames[frameid]['containstype']
-
-        items = []
-
-        linklist = soup.findAll('a')
-
-        for l in linklist:
-            tagline = HTMLParser.HTMLParser().unescape(l.text)
-            link = l['href']
-
-            fid = self.get_sub_id(link)
-            if fid:
-                link = self.base_url + self.section_url_template + fid
-
-            items.append({
-                'label': tagline,
-                'url': link,
-                'pk': fid
-            })
-        sorted_items = sorted(items, key=lambda item: item['label'])
-        return sorted_items, containstype
