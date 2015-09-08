@@ -7,7 +7,7 @@ It scrapes content from the following sites
 
  - [thepaktv.net](http://www.thepaktv.net/forums/forum.php)
  - [desironak](http://www.desironak.com/forums/forum.php)
- - [apnadramas](http://www.apnadramaspak.com/)
+ - [apnadramas](http://www.apnapakforums.com/)
 
 In addition, users can supply a community xml link for livestreams
 
