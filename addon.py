@@ -431,6 +431,10 @@ def get_episode_data(siteid, cls, epid):
         dialog.ok(api.long_name, msg)
 
 
+def __is_resolved(url):
+    return (url and isinstance(url, basestring))
+
+
 def __resolve_item(item):
     import urlresolver
     media = urlresolver.HostedMediaFile(
@@ -457,10 +461,15 @@ def __resolve_part(medialist, selected_host):
     if not stream_url:
         while medialist:
             stream_url, thumb = __resolve_item(medialist.pop())
-            if stream_url:
+            if __is_resolved(stream_url):
                 break
 
-    return stream_url, thumb
+    # still fail?
+    if __is_resolved(stream_url):
+        return stream_url, thumb
+    else:
+        msg = str(stream_url.msg)
+        raise Exception(msg)
 
 
 @plugin.route('/sites/<siteid>-<cls>/episodes/e<epid>/all')
@@ -538,10 +547,15 @@ def play_video(siteid, cls, epid, partnum):
 
     if source:
         url = source.resolve()
-        plugin.log.debug('play video: {url}'.format(url=url))
 
-        plugin.set_resolved_url(url)
+        if not __is_resolved(url):
+            msg = str(url.msg)
+            raise Exception(msg)
 
+        else:
+            plugin.log.debug('play video: {url}'.format(url=url))
+            plugin.set_resolved_url(url)        
+        
     else:
         msg = [_('cannot_play'), _('choose_source')]
         plugin.log.error(msg[0])
@@ -603,4 +617,4 @@ if __name__ == '__main__':
         plugin.run()
     except Exception, e:
         plugin.log.error(e)
-        plugin.notify(msg=e)
+        plugin.notify(msg=e, delay=8000)
