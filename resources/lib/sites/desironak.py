@@ -82,6 +82,9 @@ class DesiRonakApi(BaseForum):
         'youtube.php': (hosts.youtube, 'id='),
         'dailymotion.php': (hosts.dailymotion, 'id='),
         'tnpk.php': (hosts.tunepk, 'url='),
+        'ushare.php': (hosts.youtube, 'id='),
+        'dshare.php': (hosts.dailymotion, 'id='),
+        'tnpkshare.php': (hosts.tunepk, 'url='),        
     }
 
 ###############################################
