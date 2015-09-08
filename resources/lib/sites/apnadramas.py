@@ -11,7 +11,7 @@ class ApnaDramasApi(BaseForum):
     short_name = 'apnadramas'
     long_name = 'Apna Dramas Forum'
     local_thumb = 'thumb_apnadramas.png'
-    base_url = 'http://www.apnadramaspak.com/'
+    base_url = 'http://www.apnapakforums.com/'
     sub_id_regex = '\?(\d+)\-'
 
     section_url_template = 'forumdisplay.php?'
