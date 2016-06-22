@@ -25,6 +25,7 @@ class ApnaDramasApi(BaseForum):
         s.Channel('1131', 'Hum Sitaray', 'humsitaray.png'),
         s.Channel('1058', 'ARY Zindagi', 'aryZindagi.png'),
         s.Channel('23', 'PTV Home', 'ptv.png'),
+        s.Channel('1446', 'Ajj Entertainment', 'ajj.jpg'),
         s.Channel('592', 'Express Entertainment', 'expressEntertainment.png'),
         s.Channel('768', 'Urdu 1', 'urdu1.png'),
         s.Channel('98', 'A Plus', 'aplus.png'),
@@ -43,6 +44,7 @@ class ApnaDramasApi(BaseForum):
         s.Channel('108', 'Ary News', 'aryNews.png'),
         s.Channel('105', 'AAJ News', 'aaj.png'),
         s.Channel('259', 'Samaa News', 'samaa.png'),
+        s.Channel('1387', 'Neo News', 'neo.jpg'),
         s.Channel('348', 'Dawn News', 'dawn.png'),
     ])
 
@@ -56,6 +58,7 @@ class ApnaDramasApi(BaseForum):
     match_string = {
         'yytu.php': (hosts.youtube, 'v='),
         'dmm.php': (hosts.dailymotion, 'v='),
+        'ddeeo.php': (hosts.tunepk, 'id=')
     }
 
 ###############################################
@@ -67,7 +70,7 @@ class ApnaDramasApi(BaseForum):
         for l in linklist:
             if (l.get('id')):
                 newlist.append(l)
-            
+
                 if (l.ol):
                     parent = newlist[-1]
                     parent['data-has-children'] = True
